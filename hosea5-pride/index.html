@@ -1,0 +1,849 @@
+<title>교만을 경계하라</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;500;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: one stage (16:9 or 9:16) carried by a night → judgment → dawn color arc; player controls sit under it */
+:root {
+  --page: #0b0c0e;
+  --page-ink: #d9d6cf;
+  --page-muted: #85868c;
+  --page-line: #25272c;
+  --page-accent: #d1a858;
+  --display: "Hahmlet", "Noto Serif KR", "Nanum Myeongjo", "AppleMyungjo", serif;
+  --body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+html, body { background: var(--page); color: var(--page-ink); }
+body {
+  font-family: var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 14px 24px;
+  word-break: keep-all;
+}
+.wrap { max-width: 1400px; margin-inline: auto; display: flex; flex-direction: column; gap: 12px; }
+.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+.top h1 { margin: 0; font: 600 15px/1.3 var(--body); letter-spacing: .01em; }
+.top p { margin: 0; font: 400 12px/1.4 var(--mono); color: var(--page-muted); letter-spacing: .06em; }
+
+/* ---------- stage ---------- */
+.stage {
+  --bg-rgb: 15 22 38; --ink-rgb: 235 229 216; --muted-rgb: 143 151 168; --accent-rgb: 209 168 88;
+  position: relative;
+  container: stage / size;
+  width: min(100%, calc((100vh - 150px) * 16 / 9));
+  width: min(100%, calc((100dvh - 150px) * 16 / 9));
+  min-width: min(100%, 320px);
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: 3px;
+  background: rgb(var(--bg-rgb));
+  color: rgb(var(--ink-rgb));
+  font-family: var(--body);
+}
+.stage[data-ar="9x16"] {
+  aspect-ratio: 9 / 16;
+  width: min(100%, calc((100vh - 150px) * 9 / 16));
+  width: min(100%, calc((100dvh - 150px) * 9 / 16));
+}
+.stage:fullscreen { width: 100vw; height: 100vh; max-width: none; aspect-ratio: auto; border-radius: 0; }
+canvas#bg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.grain {
+  position: absolute; inset: -50%; pointer-events: none; opacity: .07; mix-blend-mode: overlay;
+  background-size: 180px 180px;
+}
+
+/* ---------- scenes ---------- */
+.scene {
+  position: absolute; inset: 0;
+  padding: 8cqmin 9cqmin;
+  display: flex; flex-direction: column; justify-content: center; gap: 2.6cqmin;
+  opacity: 0; visibility: hidden;
+  transition: opacity .6s ease, visibility 0s linear .6s;
+}
+.scene.on { opacity: 1; visibility: visible; transition: opacity .5s ease; }
+
+.eyebrow, .ref {
+  margin: 0;
+  font: 500 1.9cqmin/1.3 var(--mono);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: rgb(var(--accent-rgb));
+}
+.ref { color: rgb(var(--muted-rgb)); letter-spacing: .1em; }
+.display {
+  margin: 0;
+  font: 800 14cqmin/1.02 var(--display);
+  letter-spacing: -.02em;
+  text-wrap: balance;
+}
+.display .line { display: block; }
+.quote {
+  margin: 0;
+  font: 500 6cqmin/1.28 var(--display);
+  letter-spacing: -.01em;
+  max-width: 24em;
+  text-wrap: balance;
+}
+.quote.sm { font-size: 4.6cqmin; }
+.lead { margin: 0; font: 400 3.3cqmin/1.6 var(--body); color: rgb(var(--ink-rgb) / .86); max-width: 36em; text-wrap: pretty; }
+.body { margin: 0; font: 400 3cqmin/1.72 var(--body); color: rgb(var(--ink-rgb) / .84); max-width: 40em; text-wrap: pretty; }
+.muted { color: rgb(var(--muted-rgb)); }
+em, .acc { font-style: normal; color: rgb(var(--accent-rgb)); }
+.it { font-style: italic; }
+
+/* reveal primitives */
+.r {
+  opacity: 0; transform: translateY(1.6cqmin); filter: blur(5px);
+  transition: opacity .9s ease var(--d, 0s), transform 1.2s cubic-bezier(.2, .7, .1, 1) var(--d, 0s), filter .9s ease var(--d, 0s);
+}
+.w, .c {
+  display: inline-block; opacity: 0; transform: translateY(.45em); filter: blur(4px);
+  transition: opacity .7s ease var(--d, 0s), transform 1s cubic-bezier(.2, .7, .1, 1) var(--d, 0s), filter .7s ease var(--d, 0s);
+}
+.c { transform: translateY(.3em) scale(.96); }
+.on .r, .on .w, .on .c { opacity: 1; transform: none; filter: none; }
+.scene:not(.on) .r, .scene:not(.on) .w, .scene:not(.on) .c { transition-duration: .3s; transition-delay: 0s; }
+
+mark {
+  color: inherit;
+  background: linear-gradient(rgb(var(--accent-rgb) / .38), rgb(var(--accent-rgb) / .38)) no-repeat 0 92% / 0% 32%;
+  transition: background-size 1.3s cubic-bezier(.6, 0, .2, 1) var(--m, 2s);
+}
+.on mark { background-size: 100% 32%; }
+
+/* title */
+.s-title { justify-content: flex-end; padding-bottom: 12cqmin; }
+.s-title .display { font-size: 17cqmin; }
+.s-title .rule { width: 18cqmin; height: 1px; background: rgb(var(--accent-rgb)); transform-origin: left; transform: scaleX(0); transition: transform 1.4s cubic-bezier(.6, 0, .2, 1) 1.6s; }
+.on .rule { transform: scaleX(1); }
+.scene:not(.on) .rule { transition-delay: 0s; transition-duration: .3s; }
+
+/* call */
+.s-call .calls { display: flex; flex-direction: column; gap: 1.4cqmin; }
+.s-call .calls p { margin: 0; font: 300 5.2cqmin/1.25 var(--display); }
+.s-call .calls b { font-weight: 700; }
+.s-call .verdict { margin: 2cqmin 0 0; font: 700 6.4cqmin/1.2 var(--display); color: rgb(var(--accent-rgb)); }
+
+/* places */
+.s-places { justify-content: flex-start; padding-top: 9cqmin; }
+.peaks { display: grid; grid-template-columns: 1fr 1fr; gap: 6cqmin; margin-top: 3cqmin; }
+.peak { display: flex; flex-direction: column; gap: 1.2cqmin; align-items: center; text-align: center; }
+.peak h3 { margin: 0; font: 700 6.4cqmin/1 var(--display); }
+.peak .he { font: 400 1.8cqmin/1 var(--mono); letter-spacing: .14em; color: rgb(var(--muted-rgb)); }
+.peak p { margin: 0; font: 400 2.5cqmin/1.6 var(--body); color: rgb(var(--ink-rgb) / .82); max-width: 24em; }
+
+/* net */
+.s-net { justify-content: flex-start; padding-top: 10cqmin; }
+
+/* departure + waiting light */
+.orb {
+  position: absolute; right: 14%; top: 24%;
+  width: 26cqmin; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgb(var(--accent-rgb) / .95) 0 6%, rgb(var(--accent-rgb) / .32) 22%, rgb(var(--accent-rgb) / .08) 45%, transparent 70%);
+  opacity: 0;
+}
+.on .orb.leave { animation: leave 7.5s cubic-bezier(.55, 0, .7, 1) 1.2s forwards; }
+.on .orb.wait { animation: waitIn 2.4s ease 1s forwards, pulse 3.6s ease-in-out 3.4s infinite; }
+@keyframes leave {
+  0% { opacity: 0; transform: none; }
+  14% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translate(14cqmin, -26cqmin) scale(.1); }
+}
+@keyframes waitIn { from { opacity: 0; transform: scale(.4); } to { opacity: .85; transform: none; } }
+@keyframes pulse { 0%, 100% { opacity: .85; transform: none; } 50% { opacity: .5; transform: scale(.9); } }
+
+/* decay */
+.decay { display: inline-block; }
+.on .decay { animation: decay 3.2s ease-in var(--dd, 3s) forwards; }
+@keyframes decay {
+  0% { opacity: 1; filter: none; letter-spacing: 0; }
+  60% { opacity: .55; filter: blur(1px); }
+  100% { opacity: .2; filter: blur(3px); letter-spacing: .12em; }
+}
+.s-decay .quote { font-size: 6.6cqmin; }
+
+/* lion */
+.s-lion .claw { position: absolute; right: 9cqmin; top: 50%; width: 30cqmin; height: auto; transform: translateY(-50%); overflow: visible; }
+.claw path { fill: none; stroke: rgb(var(--accent-rgb)); stroke-width: 1.8; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.on .claw path { animation: draw .45s cubic-bezier(.7, 0, .3, 1) var(--d) forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.s-lion .tear { margin: 0; font: 800 9.6cqmin/1.08 var(--display); letter-spacing: -.02em; max-width: 9em; }
+
+/* teaching points */
+.tp { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3cqmin 6cqmin; align-items: center; }
+.tp.with-fig { grid-template-columns: auto minmax(0, 1fr) auto; }
+.num {
+  font: 800 30cqmin/.8 var(--display);
+  color: transparent; -webkit-text-stroke: max(1px, .22cqmin) rgb(var(--accent-rgb));
+  align-self: start;
+}
+.tp-main { display: flex; flex-direction: column; gap: 2cqmin; min-width: 0; }
+.tp-main h2 { margin: 0; font: 700 5cqmin/1.25 var(--display); text-wrap: balance; max-width: 20em; }
+.tag {
+  align-self: flex-start; margin: 0;
+  font: 500 2.2cqmin/1 var(--body); color: rgb(var(--accent-rgb));
+  padding: 1cqmin 1.6cqmin; border: 1px solid rgb(var(--accent-rgb) / .55); border-radius: 99px;
+}
+.bond { width: 30cqmin; height: auto; overflow: visible; }
+.bond .half { fill: none; stroke: rgb(var(--ink-rgb) / .7); stroke-width: .7; stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+.on .bond .half { animation: draw .9s ease var(--d) forwards, retract 1.1s cubic-bezier(.6, 0, .3, 1) var(--b) forwards; }
+@keyframes retract { from { stroke-dashoffset: 0; } to { stroke-dashoffset: .62; } }
+.bond circle { fill: rgb(var(--accent-rgb)); }
+.bond text { fill: rgb(var(--ink-rgb)); font: 500 5.2px var(--body); text-anchor: middle; }
+
+/* question */
+.answer { display: flex; flex-wrap: wrap; align-items: baseline; gap: 1.4cqmin 3cqmin; margin-top: 2cqmin; }
+.answer .a1, .answer .a2 { font: 700 4.6cqmin/1.25 var(--display); }
+.answer .a2 { color: rgb(var(--accent-rgb)); }
+.answer .arrow { font: 400 4cqmin/1 var(--mono); color: rgb(var(--muted-rgb)); }
+
+/* twins */
+.s-twins { align-items: flex-start; }
+.mirror { position: relative; display: flex; flex-direction: column; gap: 0; }
+.mirror .up, .mirror .down { margin: 0; font: 800 13cqmin/1 var(--display); letter-spacing: -.02em; }
+.mirror .water { height: 1px; width: 100%; background: rgb(var(--ink-rgb) / .35); transform-origin: left; transform: scaleX(0); transition: transform 1.4s cubic-bezier(.6, 0, .2, 1) 1.1s; margin-block: 1.4cqmin; }
+.on .mirror .water { transform: scaleX(1); }
+.mirror .down {
+  transform: scaleY(-1); color: rgb(var(--accent-rgb));
+  -webkit-mask-image: linear-gradient(to top, rgb(0 0 0 / .85), transparent 92%);
+  mask-image: linear-gradient(to top, rgb(0 0 0 / .85), transparent 92%);
+  opacity: 0; transition: opacity 1.6s ease 2s;
+}
+.on .mirror .down { opacity: 1; }
+.scene:not(.on) .mirror .down, .scene:not(.on) .mirror .water { transition-delay: 0s; transition-duration: .3s; }
+
+/* apply */
+.vows { display: flex; flex-direction: column; gap: 3.4cqmin; margin: 0; padding: 0; list-style: none; }
+.vows li { display: grid; grid-template-columns: 6cqmin minmax(0, 1fr); gap: 2cqmin; align-items: baseline; }
+.vows .n { font: 500 2.4cqmin/1 var(--mono); color: rgb(var(--accent-rgb)); }
+.vows .t { font: 700 5cqmin/1.3 var(--display); text-wrap: balance; }
+.vows .sub { display: block; margin-top: .8cqmin; font: 400 3.2cqmin/1.3 var(--display); font-style: italic; color: rgb(var(--muted-rgb)); }
+
+/* summary */
+.sum { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4cqmin; margin: 0; padding: 0; list-style: none; }
+.sum li { display: flex; flex-direction: column; gap: 1.6cqmin; padding-top: 2.2cqmin; border-top: 1px solid rgb(var(--ink-rgb) / .3); }
+.sum .n { font: 500 2cqmin/1 var(--mono); color: rgb(var(--accent-rgb)); letter-spacing: .1em; }
+.sum h3 { margin: 0; font: 700 3.9cqmin/1.3 var(--display); text-wrap: balance; }
+.sum p { margin: 0; font: 400 2.45cqmin/1.7 var(--body); color: rgb(var(--ink-rgb) / .8); }
+
+/* end */
+.s-end .display { font-size: 11cqmin; max-width: 6.6em; }
+.s-end .lead { max-width: 22em; }
+
+/* portrait layout */
+@container stage (orientation: portrait) {
+  .scene { padding: 12cqmin 8cqmin; gap: 3.6cqmin; }
+  .s-title { padding-bottom: 22cqmin; }
+  .s-title .display { font-size: 21cqmin; }
+  .eyebrow, .ref { font-size: 2.9cqmin; }
+  .quote { font-size: 8cqmin; }
+  .quote.sm { font-size: 6.4cqmin; }
+  .lead { font-size: 4.6cqmin; }
+  .body { font-size: 4.1cqmin; }
+  .s-call .calls p { font-size: 7.6cqmin; }
+  .s-call .verdict { font-size: 9cqmin; }
+  .s-places { padding-top: 16cqmin; }
+  .peaks { gap: 4cqmin; }
+  .peak h3 { font-size: 9cqmin; }
+  .peak .he { font-size: 2.8cqmin; }
+  .peak p { font-size: 3.7cqmin; }
+  .s-net { padding-top: 18cqmin; }
+  .orb { right: 8%; top: 9%; width: 42cqmin; }
+  .s-decay .quote { font-size: 9cqmin; }
+  .s-lion { justify-content: flex-end; padding-bottom: 18cqmin; }
+  .s-lion .claw { top: 12%; right: 50%; width: 46cqmin; transform: translateX(50%); }
+  .s-lion .tear { font-size: 13cqmin; }
+  .tp, .tp.with-fig { grid-template-columns: minmax(0, 1fr); gap: 4cqmin; }
+  .num { font-size: 34cqmin; }
+  .tp-main h2 { font-size: 7.4cqmin; }
+  .tag { font-size: 3.4cqmin; }
+  .bond { width: 52cqmin; justify-self: center; }
+  .answer .a1, .answer .a2 { font-size: 7cqmin; }
+  .answer .arrow { font-size: 6cqmin; }
+  .mirror .up, .mirror .down { font-size: 19cqmin; }
+  .vows .t { font-size: 7.4cqmin; }
+  .vows .sub { font-size: 4.8cqmin; }
+  .vows .n { font-size: 3.4cqmin; }
+  .vows li { grid-template-columns: 8cqmin minmax(0, 1fr); }
+  .sum { grid-template-columns: minmax(0, 1fr); gap: 4.4cqmin; }
+  .sum .n { font-size: 3cqmin; }
+  .sum h3 { font-size: 6cqmin; }
+  .sum p { font-size: 3.8cqmin; }
+  .s-end { justify-content: flex-end; padding-bottom: 18cqmin; }
+  .s-end .display { font-size: 15cqmin; }
+}
+
+.paused * { animation-play-state: paused !important; }
+
+/* ---------- controls ---------- */
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; width: 100%; max-width: 100%; }
+.stage-col { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; min-width: 36px; padding: 0 10px;
+  border: 1px solid var(--page-line); border-radius: 6px;
+  background: transparent; color: var(--page-ink);
+  font: 500 13px/1 var(--body); cursor: pointer;
+}
+.btn:hover { border-color: var(--page-muted); }
+.btn:focus-visible, .seg:focus-visible { outline: 2px solid var(--page-accent); outline-offset: 2px; }
+.btn svg { width: 16px; height: 16px; fill: currentColor; }
+.btn.primary { background: var(--page-ink); color: var(--page); border-color: var(--page-ink); }
+.track { flex: 1 1 260px; min-width: 0; display: flex; gap: 3px; height: 36px; align-items: center; }
+.seg {
+  position: relative; height: 6px; border: 0; padding: 0; border-radius: 2px; cursor: pointer;
+  background: var(--page-line); overflow: hidden;
+}
+.seg::before { content: ""; position: absolute; inset: -12px 0; }
+.seg i { position: absolute; inset: 0; width: 0; background: var(--page-accent); }
+.seg.done i { width: 100%; background: var(--page-muted); }
+.time { font: 400 12px/1 var(--mono); color: var(--page-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ar { display: inline-flex; border: 1px solid var(--page-line); border-radius: 6px; overflow: hidden; }
+.ar button { height: 34px; padding: 0 10px; border: 0; background: transparent; color: var(--page-muted); font: 500 12px/1 var(--mono); cursor: pointer; }
+.ar button[aria-pressed="true"] { background: var(--page-line); color: var(--page-ink); }
+.ar button:focus-visible { outline: 2px solid var(--page-accent); outline-offset: -2px; }
+.now { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 16px; font: 400 12px/1.4 var(--mono); color: var(--page-muted); letter-spacing: .04em; }
+.now b { color: var(--page-ink); font-weight: 500; }
+
+/* recording mode: stage only */
+html.rec body { padding: 0; }
+html.rec .top, html.rec .controls, html.rec .now { display: none; }
+html.rec .wrap { max-width: none; gap: 0; }
+html.rec .stage { width: 100vw; height: 100vh; aspect-ratio: auto; border-radius: 0; min-width: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .r, .w, .c { transform: none; filter: none; }
+  .on .decay, .on .orb.leave, .on .orb.wait { animation-duration: .01s; animation-iteration-count: 1; }
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>교만을 경계하라 · 호세아 5:1–15</h1>
+    <p>7/16 PLT · MOTION GRAPHIC</p>
+  </header>
+
+  <div class="stage-col">
+    <div class="stage" id="stage" data-ar="16x9" aria-live="polite">
+      <canvas id="bg" aria-hidden="true"></canvas>
+
+      <!-- 01 -->
+      <section class="scene s-title on" data-name="제목" data-dur="6" data-tone="grace" data-bg="">
+        <p class="eyebrow r" style="--d:.2s">7/16 · PLT · 호세아 5장</p>
+        <h2 class="display" data-split="chars" data-base=".5" data-step=".07"><span class="line">교만을</span><span class="line">경계하라</span></h2>
+        <div class="rule"></div>
+        <p class="ref r" style="--d:2s">호 5:1–15 · 우리말성경</p>
+      </section>
+
+      <!-- 02 -->
+      <section class="scene s-call" data-name="들으라" data-dur="8" data-tone="grace" data-bg="">
+        <p class="eyebrow r" style="--d:.2s">호세아 5:1</p>
+        <div class="calls">
+          <p class="r" style="--d:.6s"><b>제사장들이여,</b> 이것을 들으라!</p>
+          <p class="r" style="--d:1.5s"><b>이스라엘의 집이여,</b> 주의해 들으라!</p>
+          <p class="r" style="--d:2.4s"><b>왕족들이여,</b> 귀 기울이라!</p>
+        </div>
+        <p class="verdict r" style="--d:3.8s">너희에게 심판이 있을 것이다.</p>
+      </section>
+
+      <!-- 03 -->
+      <section class="scene s-places" data-name="미스바와 다볼" data-dur="10" data-tone="grace" data-bg="mountains">
+        <p class="eyebrow r" style="--d:.2s">은혜의 자리</p>
+        <div class="peaks">
+          <div class="peak">
+            <h3 class="r" style="--d:1.6s">미스바</h3>
+            <span class="he r" style="--d:1.8s">MIZPAH</span>
+            <p class="r" style="--d:2.4s">약속의 땅을 이기며 땅을 받는데 도저히 받지 못한 곳, 오로지 하나님의 도우심으로만 할 수 있었던 곳</p>
+          </div>
+          <div class="peak">
+            <h3 class="r" style="--d:3.4s">다볼</h3>
+            <span class="he r" style="--d:3.6s">TABOR</span>
+            <p class="r" style="--d:4.2s">드보라가 기적같이 승리한 영광의 터전</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 -->
+      <section class="scene s-net" data-name="덫과 그물" data-dur="8" data-tone="pride" data-bg="mountains net">
+        <p class="eyebrow r" style="--d:.2s">호세아 5:1</p>
+        <p class="quote" data-split="words" data-base=".5" data-step=".12">너희가 <em>미스바의 덫</em>이 됐고 <em>다볼에 쳐 놓은 그물</em>이 됐다.</p>
+        <p class="lead r" style="--d:3.2s">은혜의 자리가 교만으로 인해 한순간에 타락의 자리가 될 수 있습니다.</p>
+      </section>
+
+      <!-- 05 -->
+      <section class="scene s-root" data-name="교만의 증언" data-dur="9" data-tone="pride" data-bg="weeds">
+        <p class="eyebrow r" style="--d:.2s">호세아 5:4–5</p>
+        <p class="lead r" style="--d:.5s">그것은 음란한 영이 그들 마음속에 있고 그들이 여호와를 알지 못하기 때문이다.</p>
+        <p class="quote" data-split="words" data-base="2.2" data-step=".14"><em>이스라엘의 교만이</em> 그들에 대해 증언하고 있다.</p>
+      </section>
+
+      <!-- 06 -->
+      <section class="scene s-depart" data-name="떠나신 하나님" data-dur="9" data-tone="pride" data-bg="">
+        <div class="orb leave" aria-hidden="true"></div>
+        <p class="eyebrow r" style="--d:.2s">호세아 5:6</p>
+        <p class="lead r" style="--d:.5s">그들이 그들의 양 떼와 소 떼를 데리고 여호와를 찾아갈 것이다.</p>
+        <p class="lead r" style="--d:2s">그러나 그들은 그분을 찾지 못할 것이다.</p>
+        <p class="quote" data-split="words" data-base="3.6" data-step=".16">그분이 그들 앞에서 <em>스스로 떠나셨다.</em></p>
+      </section>
+
+      <!-- 07 -->
+      <section class="scene s-decay" data-name="좀먹음과 썩음" data-dur="8" data-tone="judgment" data-bg="ash">
+        <p class="eyebrow r" style="--d:.2s">호세아 5:12</p>
+        <p class="quote r" style="--d:.6s">내가 에브라임에게 <em class="decay" style="--dd:2.8s">좀먹음</em>같이 되고</p>
+        <p class="quote r" style="--d:1.5s">유다 족속에게는 <em class="decay" style="--dd:3.6s">썩음</em>과 같이 될 것이다.</p>
+      </section>
+
+      <!-- 08 -->
+      <section class="scene s-assyria" data-name="고칠 수 없는 상처" data-dur="9" data-tone="judgment" data-bg="ash">
+        <p class="eyebrow r" style="--d:.2s">호세아 5:13</p>
+        <p class="lead r" style="--d:.5s">에브라임이 자기 병을 보고 유다가 자기 상처를 보았다.<br>에브라임은 앗시리아에 가서 야렙 왕에게 사람을 보냈다.</p>
+        <p class="quote" data-split="words" data-base="2.6" data-step=".13">그러나 그는 <em>너희를 고칠 수 없었고</em> 너희 상처를 낫게 할 수 없었다.</p>
+      </section>
+
+      <!-- 09 -->
+      <section class="scene s-lion" data-name="사자" data-dur="8" data-tone="judgment" data-bg="ash">
+        <svg class="claw" viewBox="0 0 100 120" aria-hidden="true">
+          <path pathLength="1" d="M28 6 C 34 40, 30 80, 12 114" style="--d:2.1s"/>
+          <path pathLength="1" d="M52 2 C 58 40, 54 84, 38 118" style="--d:2.25s"/>
+          <path pathLength="1" d="M76 8 C 82 42, 78 82, 62 112" style="--d:2.4s"/>
+        </svg>
+        <p class="eyebrow r" style="--d:.2s">호세아 5:14</p>
+        <p class="lead r" style="--d:.5s">내가 에브라임에게는 사자같이 되고<br>유다 족속에게는 젊은 사자같이 될 것이다.</p>
+        <p class="tear" data-split="words" data-base="2" data-step=".14">바로 내가 그들을 <em>찢을 것이다.</em></p>
+        <p class="body muted r" style="--d:3.8s">아무도 내 입에서 빼내 구해 줄 사람이 없을 것이다.</p>
+      </section>
+
+      <!-- 10 -->
+      <section class="scene s-tp" data-name="Teaching point 1" data-dur="13" data-tone="pride" data-bg="weeds">
+        <div class="tp">
+          <div class="num r" style="--d:.2s" aria-hidden="true">1</div>
+          <div class="tp-main">
+            <p class="eyebrow r" style="--d:.3s">Teaching point 1 / 3</p>
+            <h2 class="r" style="--d:.6s">은혜의 정점에서 피어나는 교만을 경계하라</h2>
+            <p class="tag r" style="--d:1.2s">자아 중심성 경계</p>
+            <p class="body r" style="--d:1.8s;--m:4s">미스바와 다볼같은 은혜의 자리가 교만으로 인해 한순간에 타락의 자리가 될 수 있습니다. 큰 성취와 평안 뒤에 <mark>“내가 해냈다”</mark>며 하나님이 아닌 ‘은혜받은 특별한 나’에게 주목하는 태도를 늘 깨어 경계해야 합니다.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 11 -->
+      <section class="scene s-tp" data-name="Teaching point 2" data-dur="13" data-tone="pride" data-bg="weeds">
+        <div class="tp with-fig">
+          <div class="num r" style="--d:.2s" aria-hidden="true">2</div>
+          <div class="tp-main">
+            <p class="eyebrow r" style="--d:.3s">Teaching point 2 / 3</p>
+            <h2 class="r" style="--d:.6s">교만은 ‘관계를 파괴하는 죄의 뿌리입니다.’</h2>
+            <p class="tag r" style="--d:1.2s">관계의 단절과 독선</p>
+            <p class="body r" style="--d:1.8s;--m:4.6s">교만은 하나님과 이웃 사이의 관계를 파괴합니다. 다른 죄와 달리 교만은 스스로 무례하고 오만하게 굴면서도 그 사실을 전혀 모른 채, <mark>타인의 티끌만 정죄하고 비방하여</mark> 공동체를 분열시킵니다.</p>
+          </div>
+          <svg class="bond r" style="--d:1s" viewBox="0 0 100 92" role="img" aria-label="하나님, 나, 이웃을 잇는 선이 끊어지는 도식">
+            <path class="half" pathLength="1" d="M50 14 L34 47" style="--d:1.2s;--b:5.2s"/>
+            <path class="half" pathLength="1" d="M18 80 L34 47" style="--d:1.2s;--b:5.2s"/>
+            <path class="half" pathLength="1" d="M50 14 L66 47" style="--d:1.5s;--b:5.6s"/>
+            <path class="half" pathLength="1" d="M82 80 L66 47" style="--d:1.5s;--b:5.6s"/>
+            <path class="half" pathLength="1" d="M18 80 L50 80" style="--d:1.8s;--b:6s"/>
+            <path class="half" pathLength="1" d="M82 80 L50 80" style="--d:1.8s;--b:6s"/>
+            <circle cx="50" cy="14" r="2.4"/><circle cx="18" cy="80" r="2.4"/><circle cx="82" cy="80" r="2.4"/>
+            <text x="50" y="6">하나님</text><text x="18" y="91">나</text><text x="82" y="91">이웃</text>
+          </svg>
+        </div>
+      </section>
+
+      <!-- 12 -->
+      <section class="scene s-q" data-name="왜 교만인가" data-dur="9" data-tone="pride" data-bg="weeds">
+        <p class="lead muted r" style="--d:.3s">교만의 잡초가 자신과 공동체를 파멸로 이끈다는 것…</p>
+        <p class="quote" data-split="words" data-base="1.4" data-step=".12">사단이 <em>교만의 영</em>으로 집중공격하는 이유는…?</p>
+        <div class="answer">
+          <span class="a1 r" style="--d:3.8s">교만은 패망의 선봉</span>
+          <span class="arrow r" style="--d:4.4s" aria-hidden="true">→</span>
+          <span class="a2 r" style="--d:4.8s">영적 교제권을 없애는 것</span>
+        </div>
+        <p class="ref r" style="--d:5.4s">참고 · 잠 16:18</p>
+      </section>
+
+      <!-- 13 -->
+      <section class="scene s-twins" data-name="자랑과 연민" data-dur="8" data-tone="pride" data-bg="weeds">
+        <p class="eyebrow r" style="--d:.2s">쌍둥이처럼 닮은</p>
+        <div class="mirror">
+          <p class="up" data-split="chars" data-base=".4" data-step=".08">자기 자랑</p>
+          <div class="water"></div>
+          <p class="down" aria-hidden="true">자기연민</p>
+        </div>
+        <p class="lead r" style="--d:3.6s"><span class="acc">자기 자랑, 자기연민</span>은 쌍둥이처럼 닮은 교만의 형태이다.</p>
+      </section>
+
+      <!-- 14 -->
+      <section class="scene s-tp" data-name="Teaching point 3" data-dur="13" data-tone="grace" data-bg="">
+        <div class="tp">
+          <div class="num r" style="--d:.2s" aria-hidden="true">3</div>
+          <div class="tp-main">
+            <p class="eyebrow r" style="--d:.3s">Teaching point 3 / 3</p>
+            <h2 class="r" style="--d:.6s">영적 교제권을 박탈하려는 사탄의 음모를 이기라</h2>
+            <p class="tag r" style="--d:1.2s">겸손으로 누리는 친밀함</p>
+            <p class="body r" style="--d:1.8s;--m:4.6s">사탄은 교만으로 하나님과의 기도를 막고 친밀한 교제권을 빼앗으려 합니다. <mark>하나님은 교만한 자를 대적하시고 겸손한 자에게 은혜를 주십니다.</mark> 하늘 보좌를 버리고 죽기까지 복종하신 예수님의 겸손을 날마다 덧입어야 합니다.</p>
+            <p class="ref r" style="--d:2.6s">참고 · 약 4:6 · 벧전 5:5 · 빌 2:8</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 15 -->
+      <section class="scene s-wait" data-name="기다리시는 하나님" data-dur="10" data-tone="grace" data-bg="">
+        <div class="orb wait" aria-hidden="true"></div>
+        <p class="eyebrow r" style="--d:.2s">호세아 5:15</p>
+        <p class="quote" data-split="words" data-base=".6" data-step=".12">내가 내 자리로 돌아가서 그들이 죄를 뉘우치고 나를 찾을 때까지 <em>기다릴 것이다.</em></p>
+        <p class="lead r" style="--d:3.8s">그들이 고통 속에서 나를 간절히 찾을 것이다.</p>
+      </section>
+
+      <!-- 16 -->
+      <section class="scene s-apply" data-name="결단" data-dur="9" data-tone="dawn" data-bg="">
+        <p class="eyebrow r" style="--d:.2s">오늘의 결단</p>
+        <ol class="vows">
+          <li class="r" style="--d:.7s"><span class="n">01</span><span class="t">하나님의 사랑을 구하고, 부어주시는 사랑으로 행하자!</span></li>
+          <li class="r" style="--d:2s"><span class="n">02</span><span class="t">사랑과 용납<span class="sub">unconditional love</span></span></li>
+        </ol>
+      </section>
+
+      <!-- 17 -->
+      <section class="scene s-sum" data-name="Summary" data-dur="14" data-tone="dawn" data-bg="">
+        <p class="eyebrow r" style="--d:.2s">Summary</p>
+        <ol class="sum">
+          <li class="r" style="--d:.6s"><span class="n">01</span><h3>가장 평안할 때를 경계하라</h3><p>성취와 풍요의 정점에서 소리 없이 피어나는 교만의 독초를 늘 경계해야합니다.</p></li>
+          <li class="r" style="--d:2.2s"><span class="n">02</span><h3>교만은 관계를 파괴한다</h3><p>교만은 하나님과의 소통을 막고 이웃을 정죄하게 만들며 소중한 공동체의 관계를 단절시킵니다.</p></li>
+          <li class="r" style="--d:3.8s"><span class="n">03</span><h3>십자가로만 이길 수 있다</h3><p>내 안의 자랑과 연민을 매일 십자가에 못박고 주님의 겸손을 덧입을 때 참된 영적 교제를 누릴 수 있습니다.</p></li>
+        </ol>
+      </section>
+
+      <!-- 18 -->
+      <section class="scene s-end" data-name="십자가" data-dur="9" data-tone="dawn" data-bg="cross">
+        <p class="eyebrow r" style="--d:.4s">7/16 PLT · 교만을 경계하라</p>
+        <h2 class="display" data-split="words" data-base="1.2" data-step=".2">십자가로만 이길 수 있다</h2>
+        <p class="lead r" style="--d:3s">내 안의 자랑과 연민을 매일 십자가에 못박고 주님의 겸손을 덧입을 때</p>
+      </section>
+
+      <div class="grain" id="grain" aria-hidden="true"></div>
+    </div>
+
+    <div class="controls" role="group" aria-label="재생 컨트롤">
+      <button class="btn primary" id="play" type="button" aria-label="일시정지">
+        <svg viewBox="0 0 16 16" id="ico-pause"><rect x="3" y="2" width="3.5" height="12" rx="1"/><rect x="9.5" y="2" width="3.5" height="12" rx="1"/></svg>
+        <svg viewBox="0 0 16 16" id="ico-play" hidden><path d="M4 2.2v11.6a.8.8 0 0 0 1.2.7l9.4-5.8a.8.8 0 0 0 0-1.4L5.2 1.5A.8.8 0 0 0 4 2.2z"/></svg>
+      </button>
+      <button class="btn" id="prev" type="button" aria-label="이전 장면"><svg viewBox="0 0 16 16"><path d="M3 2h2v12H3zM14 2.8v10.4a.7.7 0 0 1-1.1.6L6.2 8.6a.7.7 0 0 1 0-1.2l6.7-5.2a.7.7 0 0 1 1.1.6z"/></svg></button>
+      <button class="btn" id="next" type="button" aria-label="다음 장면"><svg viewBox="0 0 16 16"><path d="M11 2h2v12h-2zM2 2.8v10.4a.7.7 0 0 0 1.1.6l6.7-5.2a.7.7 0 0 0 0-1.2L3.1 2.2A.7.7 0 0 0 2 2.8z"/></svg></button>
+      <div class="track" id="track"></div>
+      <span class="time" id="time">0:00 / 0:00</span>
+      <div class="ar" role="group" aria-label="화면 비율">
+        <button type="button" id="ar169" data-ar="16x9" aria-pressed="true">16:9</button>
+        <button type="button" id="ar916" data-ar="9x16" aria-pressed="false">9:16</button>
+      </div>
+      <button class="btn" id="fs" type="button">전체화면</button>
+    </div>
+    <div class="now"><span id="label"><b>01</b> · 제목</span><span>Space 재생/정지 · ← → 장면 이동 · F 전체화면</span></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const scenes = [...stage.querySelectorAll('.scene')];
+  const durs = scenes.map(s => parseFloat(s.dataset.dur));
+  const total = durs.reduce((a, b) => a + b, 0);
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hash = location.hash.slice(1);
+  const REC = hash === 'rec' || hash === 'rec916';
+  if (REC) document.documentElement.classList.add('rec');
+  if (hash === 'rec916') stage.dataset.ar = '9x16';
+
+  // ---- split text into word / char spans with staggered delays ----
+  function split(el) {
+    const mode = el.dataset.split, base = parseFloat(el.dataset.base || 0), step = parseFloat(el.dataset.step || .1);
+    let i = 0;
+    const walk = node => {
+      [...node.childNodes].forEach(n => {
+        if (n.nodeType === 3) {
+          const parts = mode === 'chars' ? [...n.textContent] : n.textContent.split(/(\s+)/);
+          const frag = document.createDocumentFragment();
+          parts.forEach(p => {
+            if (!p) return;
+            if (/^\s+$/.test(p)) { frag.appendChild(document.createTextNode(p)); return; }
+            const s = document.createElement('span');
+            s.className = mode === 'chars' ? 'c' : 'w';
+            s.textContent = p;
+            s.style.setProperty('--d', (base + i++ * step).toFixed(2) + 's');
+            frag.appendChild(s);
+          });
+          n.replaceWith(frag);
+        } else if (n.nodeType === 1) walk(n);
+      });
+    };
+    walk(el);
+  }
+  stage.querySelectorAll('[data-split]').forEach(split);
+
+  // ---- tones (single source for DOM + canvas) ----
+  const hex = h => [1, 3, 5].map(k => parseInt(h.slice(k, k + 2), 16));
+  const TONES = {
+    grace:    { bg: '#0f1626', ink: '#ebe5d8', muted: '#8f97a8', accent: '#d1a858' },
+    pride:    { bg: '#13160f', ink: '#e6e3d3', muted: '#8d927a', accent: '#b4b84e' },
+    judgment: { bg: '#1b1312', ink: '#ecdfd8', muted: '#9c8781', accent: '#d0603f' },
+    dawn:     { bg: '#eeeae6', ink: '#1d1c22', muted: '#6c6870', accent: '#94621a' }
+  };
+  for (const k in TONES) for (const c in TONES[k]) TONES[k][c] = hex(TONES[k][c]);
+  const cur = JSON.parse(JSON.stringify(TONES.grace));
+  let tgt = TONES.grace;
+
+  // ---- canvas layers ----
+  const LAYERS = ['mountains', 'net', 'weeds', 'ash', 'cross'];
+  const RATE = { mountains: 1 / 2.8, net: 1 / 2.2, weeds: 1 / 7, ash: 1 / 1.6, cross: 1 / 3.6 };
+  const L = {}, T = {};
+  LAYERS.forEach(k => { L[k] = 0; T[k] = 0; });
+
+  const cv = document.getElementById('bg'), ctx = cv.getContext('2d');
+  let W = 0, H = 0, DPR = 1;
+  function resize() {
+    const r = stage.getBoundingClientRect();
+    DPR = Math.min(2, window.devicePixelRatio || 1);
+    W = Math.max(1, r.width); H = Math.max(1, r.height);
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    buildMountain();
+  }
+  new ResizeObserver(resize).observe(stage);
+
+  // seeded random so shapes stay put across resizes
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+  const dust = Array.from({ length: 110 }, () => ({ x: rnd(), y: rnd(), s: .4 + rnd() * 1.4, v: .006 + rnd() * .02, p: rnd() * 6.28 }));
+  const weeds = Array.from({ length: 16 }, (_, i) => {
+    const pts = [], n = 14, h = .08 + rnd() * .2;
+    let x = (i + .2 + rnd() * .6) / 16, y = 1.02, a = -Math.PI / 2 + (rnd() - .5) * .3;
+    pts.push([x, y]);
+    for (let k = 0; k < n; k++) { a += (rnd() - .5) * .28; x += Math.cos(a) * h / n * .55; y += Math.sin(a) * h / n; pts.push([x, y]); }
+    return { pts, delay: rnd() * .45, leaf: rnd() > .5 ? 1 : -1 };
+  });
+
+  // Mizpah ridge (left) + Tabor dome (right), normalized
+  let mountain = [], mLen = [], mTotal = 0;
+  function buildMountain() {
+    const P = [[0, .86], [.08, .82], [.15, .74], [.21, .66], [.25, .62], [.27, .615], [.3, .62], [.34, .66], [.4, .74], [.47, .82], [.52, .86]];
+    for (let k = 0; k <= 24; k++) {
+      const t = k / 24, ang = Math.PI * (1 - t);
+      P.push([.54 + t * .36, .87 - .27 * Math.pow(Math.sin(ang), .75)]);
+    }
+    P.push([.95, .88], [1, .885]);
+    const k = H > W ? .5 : 1; // flatter peaks on a tall frame
+    mountain = P.map(([x, y]) => [x * W, (.88 - (.88 - y) * k) * H]);
+    mLen = [0]; mTotal = 0;
+    for (let k = 1; k < mountain.length; k++) { mTotal += Math.hypot(mountain[k][0] - mountain[k - 1][0], mountain[k][1] - mountain[k - 1][1]); mLen.push(mTotal); }
+  }
+  const rgba = (c, a) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${a})`;
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+
+  function draw(dt, time) {
+    const bg = cur.bg, ink = cur.ink, acc = cur.accent, mut = cur.muted;
+    ctx.fillStyle = rgba(bg, 1); ctx.fillRect(0, 0, W, H);
+    const m = Math.min(W, H);
+
+    // vignette
+    const vg = ctx.createRadialGradient(W * .5, H * .45, m * .2, W * .5, H * .5, Math.max(W, H) * .75);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.28)');
+    ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+
+    // mountains
+    if (L.mountains > .001) {
+      const p = ease(L.mountains), upto = p * mTotal;
+      ctx.beginPath(); ctx.moveTo(mountain[0][0], mountain[0][1]);
+      for (let k = 1; k < mountain.length; k++) {
+        if (mLen[k] <= upto) ctx.lineTo(mountain[k][0], mountain[k][1]);
+        else { const f = (upto - mLen[k - 1]) / (mLen[k] - mLen[k - 1]); ctx.lineTo(mountain[k - 1][0] + (mountain[k][0] - mountain[k - 1][0]) * f, mountain[k - 1][1] + (mountain[k][1] - mountain[k - 1][1]) * f); break; }
+      }
+      ctx.strokeStyle = rgba(ink, .55 * L.mountains); ctx.lineWidth = Math.max(1, m * .0022); ctx.stroke();
+      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+      const g = ctx.createLinearGradient(0, H * .6, 0, H);
+      g.addColorStop(0, rgba(acc, .10 * L.mountains)); g.addColorStop(1, rgba(acc, 0));
+      ctx.fillStyle = g; ctx.fill();
+    }
+
+    // net dropping over both peaks
+    if (L.net > .001) {
+      const p = ease(L.net), drop = (1 - p) * -H * .7, cols = 26, rows = 11;
+      const y0 = H * .5, y1 = H * 1.02;
+      const at = (i, j) => {
+        const u = i / cols, v = j / rows;
+        const x = W * (-.02 + u * 1.04);
+        const sag = Math.sin(Math.PI * u) * H * .05 + Math.sin(u * 12 + time * .6) * H * .004;
+        return [x, y0 + (y1 - y0) * v + sag + drop];
+      };
+      ctx.strokeStyle = rgba(acc, .42 * L.net); ctx.lineWidth = Math.max(.8, m * .0014);
+      for (let j = 0; j <= rows; j++) { ctx.beginPath(); for (let i = 0; i <= cols; i++) { const [x, y] = at(i, j); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.stroke(); }
+      for (let i = 0; i <= cols; i++) { ctx.beginPath(); for (let j = 0; j <= rows; j++) { const [x, y] = at(i, j); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.stroke(); }
+    }
+
+    // weeds growing from the floor
+    if (L.weeds > .001) {
+      ctx.lineWidth = Math.max(1, m * .0018); ctx.lineCap = 'round';
+      weeds.forEach(wd => {
+        const g = clamp((L.weeds - wd.delay) / (1 - wd.delay));
+        if (g <= 0) return;
+        const n = wd.pts.length - 1, upto = g * n;
+        ctx.strokeStyle = rgba(acc, .5 * Math.min(1, L.weeds * 1.5));
+        ctx.beginPath(); ctx.moveTo(wd.pts[0][0] * W, wd.pts[0][1] * H);
+        for (let k = 1; k <= Math.ceil(upto); k++) {
+          const f = Math.min(1, upto - (k - 1)), a = wd.pts[k - 1], b = wd.pts[k];
+          ctx.lineTo((a[0] + (b[0] - a[0]) * f) * W, (a[1] + (b[1] - a[1]) * f) * H);
+        }
+        ctx.stroke();
+        for (let k = 3; k < upto; k += 3) {
+          const [x, y] = wd.pts[k], side = (k % 6 ? 1 : -1) * wd.leaf, len = m * .028 * clamp(upto - k);
+          ctx.beginPath(); ctx.moveTo(x * W, y * H);
+          ctx.quadraticCurveTo(x * W + side * len, y * H - len * .2, x * W + side * len * 1.2, y * H - len * .9);
+          ctx.stroke();
+        }
+      });
+    }
+
+    // dust / ash particles
+    const fall = L.ash;
+    dust.forEach(d => {
+      if (!RM) {
+        d.y += (fall * d.v * 2.4 - (1 - fall) * d.v) * dt;
+        d.x += Math.sin(time * .4 + d.p) * .0006;
+        if (d.y < -.02) d.y = 1.02; if (d.y > 1.02) d.y = -.02;
+        if (d.x < 0) d.x += 1; if (d.x > 1) d.x -= 1;
+      }
+      const tw = .5 + .5 * Math.sin(time * 1.3 + d.p * 3);
+      const c = fall > .5 ? mut : acc;
+      ctx.fillStyle = rgba(c, (.18 + .32 * tw) * (fall > .5 ? 1 : .8));
+      ctx.beginPath(); ctx.arc(d.x * W, d.y * H, d.s * (1 + fall * .6) * m / 900, 0, 6.283); ctx.fill();
+    });
+
+    // cross of light
+    if (L.cross > .001) {
+      const p = L.cross, port = H > W;
+      const cx = port ? W * .5 : W * .76, top = port ? H * .08 : H * .14, bot = port ? H * .5 : H * .88;
+      const armY = top + (bot - top) * .3, arm = port ? W * .22 : H * .16;
+      const glow = ctx.createRadialGradient(cx, armY, 0, cx, armY, m * .55);
+      glow.addColorStop(0, rgba(acc, .2 * p)); glow.addColorStop(1, rgba(acc, 0));
+      ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+      const v = ease(clamp(p / .6)), h = ease(clamp((p - .45) / .55));
+      ctx.strokeStyle = rgba(acc, .9); ctx.lineWidth = Math.max(1.5, m * .0045); ctx.lineCap = 'butt';
+      ctx.beginPath(); ctx.moveTo(cx, top); ctx.lineTo(cx, top + (bot - top) * v); ctx.stroke();
+      if (h > 0) { ctx.beginPath(); ctx.moveTo(cx - arm * h, armY); ctx.lineTo(cx + arm * h, armY); ctx.stroke(); }
+    }
+  }
+
+  // grain texture, generated once
+  (() => {
+    const g = document.createElement('canvas'); g.width = g.height = 180;
+    const gx = g.getContext('2d'), img = gx.createImageData(180, 180);
+    for (let k = 0; k < img.data.length; k += 4) { const v = Math.random() * 255; img.data[k] = img.data[k + 1] = img.data[k + 2] = v; img.data[k + 3] = 255; }
+    gx.putImageData(img, 0, 0);
+    try { document.getElementById('grain').style.backgroundImage = `url(${g.toDataURL()})`; } catch (e) {}
+  })();
+
+  // ---- player ----
+  const $ = id => document.getElementById(id);
+  const track = $('track');
+  const segs = scenes.map((s, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'seg'; b.style.flex = durs[i];
+    b.setAttribute('aria-label', `${i + 1}. ${s.dataset.name}`);
+    b.appendChild(document.createElement('i'));
+    b.addEventListener('click', () => go(i));
+    track.appendChild(b);
+    return b;
+  });
+  let idx = 0, t = 0, playing = !RM, ended = false;
+  const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+  const before = i => durs.slice(0, i).reduce((a, b) => a + b, 0);
+
+  function go(i) {
+    i = Math.max(0, Math.min(scenes.length - 1, i));
+    scenes.forEach(s => s.classList.remove('on'));
+    idx = i; t = 0; ended = false;
+    const s = scenes[i];
+    void s.offsetWidth;
+    s.classList.add('on');
+    tgt = TONES[s.dataset.tone] || TONES.grace;
+    const bgs = (s.dataset.bg || '').split(/\s+/);
+    LAYERS.forEach(k => { T[k] = bgs.includes(k) ? 1 : 0; });
+    segs.forEach((b, k) => { b.classList.toggle('done', k < i); b.querySelector('i').style.width = k < i ? '100%' : '0'; b.setAttribute('aria-current', k === i ? 'step' : 'false'); });
+    $('label').innerHTML = `<b>${String(i + 1).padStart(2, '0')}</b> / ${scenes.length} · ${s.dataset.name}`;
+    if (RM) { LAYERS.forEach(k => L[k] = T[k]); Object.assign(cur, JSON.parse(JSON.stringify(tgt))); }
+  }
+  function setPlaying(p) {
+    playing = p;
+    stage.classList.toggle('paused', !p);
+    $('ico-play').hidden = p; $('ico-pause').hidden = !p;
+    $('play').setAttribute('aria-label', p ? '일시정지' : '재생');
+  }
+  $('play').addEventListener('click', () => {
+    if (ended) { go(0); setPlaying(true); return; }
+    setPlaying(!playing);
+  });
+  $('prev').addEventListener('click', () => go(t > 1.5 ? idx : idx - 1));
+  $('next').addEventListener('click', () => go(idx + 1));
+  document.querySelectorAll('.ar button').forEach(b => b.addEventListener('click', () => {
+    stage.dataset.ar = b.dataset.ar;
+    document.querySelectorAll('.ar button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    try { localStorage.setItem('hosea5-ar', b.dataset.ar); } catch (e) {}
+  }));
+  try {
+    const saved = localStorage.getItem('hosea5-ar');
+    if (saved && !REC) document.querySelector(`.ar button[data-ar="${saved}"]`)?.click();
+  } catch (e) {}
+  $('fs').addEventListener('click', () => {
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    else stage.requestFullscreen?.().catch(() => {});
+  });
+  document.addEventListener('keydown', e => {
+    if (e.target.closest && e.target.closest('button') && (e.key === ' ' || e.key === 'Enter')) return;
+    if (e.key === ' ') { e.preventDefault(); $('play').click(); }
+    else if (e.key === 'ArrowRight') go(idx + 1);
+    else if (e.key === 'ArrowLeft') go(idx - 1);
+    else if (e.key === 'f' || e.key === 'F') $('fs').click();
+  });
+
+  let last = performance.now(), clock = 0;
+  function frame(now) {
+    const dt = Math.min(.1, (now - last) / 1000); last = now; clock += dt;
+    if (playing && !ended) {
+      t += dt;
+      if (t >= durs[idx]) {
+        if (idx < scenes.length - 1) go(idx + 1);
+        else { t = durs[idx]; ended = true; setPlaying(false); stage.classList.remove('paused'); }
+      }
+    }
+    // ease tones and layers
+    const k = RM ? 1 : 1 - Math.exp(-dt * 2.2);
+    for (const c in cur) for (let j = 0; j < 3; j++) cur[c][j] += (tgt[c][j] - cur[c][j]) * k;
+    LAYERS.forEach(n => {
+      const r = T[n] > L[n] ? RATE[n] : 1 / .9;
+      L[n] = RM ? T[n] : T[n] > L[n] ? Math.min(T[n], L[n] + r * dt) : Math.max(T[n], L[n] - r * dt);
+    });
+    const sv = stage.style;
+    sv.setProperty('--bg-rgb', cur.bg.map(Math.round).join(' '));
+    sv.setProperty('--ink-rgb', cur.ink.map(Math.round).join(' '));
+    sv.setProperty('--muted-rgb', cur.muted.map(Math.round).join(' '));
+    sv.setProperty('--accent-rgb', cur.accent.map(Math.round).join(' '));
+    draw(dt, clock);
+    const seg = segs[idx].querySelector('i');
+    seg.style.width = (Math.min(1, t / durs[idx]) * 100).toFixed(2) + '%';
+    $('time').textContent = `${fmt(before(idx) + t)} / ${fmt(total)}`;
+    requestAnimationFrame(frame);
+  }
+
+  resize();
+  go(0);
+  setPlaying(playing);
+  requestAnimationFrame(frame);
+})();
+</script>
