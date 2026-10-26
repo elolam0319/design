@@ -157,18 +157,18 @@ body {
 #f-amp { top: 418px; font: 400 92px/1 var(--display-en); color: var(--coral); }
 #f-b { top: 520px; font: 900 168px/1 var(--gothic); }
 #f-en { top: 718px; font: 400 44px/1 var(--display-en); letter-spacing: .08em; color: var(--coral); }
-#f-house { left: 0; top: 800px; width: 860px; height: 210px; }
-.mb { position: absolute; width: 64px; height: 40px; background: var(--navy); border-radius: 2px; }
+#f-house { left: 0; top: 790px; width: 860px; height: 230px; }
+.mb { position: absolute; width: 64px; height: 34px; background: var(--navy); border-radius: 2px; }
 .mb.c { background: var(--coral); }
-#m-roof { position: absolute; left: 324px; top: 0; width: 212px; height: 72px; background: var(--navy); clip-path: polygon(50% 0, 100% 100%, 0 100%); transform-origin: 50% 100%; }
-#f-ref { top: 1030px; font: 400 30px/1 var(--display-en); letter-spacing: .2em; text-indent: .2em; opacity: .7; }
+#m-roof { position: absolute; left: 318px; top: 0; width: 224px; height: 60px; background: var(--navy); clip-path: polygon(50% 0, 100% 100%, 0 100%); transform-origin: 50% 100%; }
+#f-ref { top: 1045px; font: 400 30px/1 var(--display-en); letter-spacing: .2em; text-indent: .2em; opacity: .7; }
 
 #bar { left: 110px; top: 1480px; width: 860px; height: 170px; display: flex; border-radius: 4px; overflow: hidden; }
-#bar > div { display: flex; flex-direction: column; justify-content: center; }
-#bar .when { width: 400px; background: var(--cream); color: var(--navy); padding-left: 30px; gap: 12px; }
+#bar > div { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+#bar .when { width: 400px; background: var(--cream); color: var(--navy); gap: 12px; }
 #bar .when b { font: 400 50px/1 var(--display-en); letter-spacing: .02em; white-space: nowrap; }
 #bar .when span { font: 700 30px/1 var(--gothic); }
-#bar .where { flex: 1; background: var(--coral); color: var(--cream); padding-left: 32px; gap: 12px; }
+#bar .where { flex: 1; background: var(--coral); color: var(--cream); gap: 12px; }
 #bar .where b { font: 900 36px/1 var(--gothic); letter-spacing: -.02em; }
 #bar .where span { font: 700 30px/1 var(--gothic); }
 #f-motto { top: 1700px; font: 700 38px/1.5 var(--gothic); letter-spacing: -.02em; color: var(--cream); }
@@ -412,15 +412,18 @@ $('roof-txt').style.top = (by(ROWS - 1) - 8 - 80) + 'px';
 
 // mini house for the final poster (callback to the cornerstone scene)
 const mini = [];
-for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) {
+// one coral cornerstone slab for the ground floor, three navy floors on it, then the roof
+const MX = 330, MB = 34, MG = 4, MBASE = 230;
+for (let r = 0; r < 4; r++) for (let c = 0; c < (r ? 3 : 1); c++) {
   const el = document.createElement('div');
-  el.className = 'mb' + (r === 0 ? ' c' : '');
-  el.style.left = (334 + c * 66) + 'px';
-  el.style.top = (170 - 40 - r * 44) + 'px';
+  el.className = 'mb' + (r ? '' : ' c');
+  el.style.left = (MX + c * (64 + MG)) + 'px';
+  el.style.top = (MBASE - MB - r * (MB + MG)) + 'px';
+  if (!r) el.style.width = (3 * 64 + 2 * MG) + 'px';
   $('f-house').append(el);
   mini.push(el);
 }
-$('m-roof').style.top = (170 - 40 - 44 - 4 - 72) + 'px';
+$('m-roof').style.top = (MBASE - 4 * MB - 3 * MG - MG - 60) + 'px';
 
 // ---------- build: rolling digits ----------
 const rolls = [];
@@ -584,14 +587,14 @@ function render(t) {
     fin('f-lab', 33.5); fin('f-g', 33.7); fin('f-amp', 33.95); fin('f-b', 34.1); fin('f-en', 34.4);
     put($('f-house'), t >= 34.6 ? 1 : 0, '');
     mini.forEach((m, i) => {
-      const k = P(t, 34.7 + i * .12, 35.1 + i * .12);
+      const k = P(t, 34.7 + i * .1, 35.1 + i * .1);
       m.style.opacity = Math.min(1, k * 4).toFixed(3);
       m.style.transform = `translateY(${-120 * (1 - oBack(k, 1.4))}px)`;
     });
-    const mr = P(t, 35.5, 35.9);
+    const mr = P(t, 36.0, 36.4);
     $('m-roof').style.opacity = Math.min(1, mr * 4).toFixed(3);
     $('m-roof').style.transform = `translateY(${-90 * (1 - oBack(mr, 1.3))}px)`;
-    fin('f-ref', 35.8, .7);
+    fin('f-ref', 36.3, .7);
 
     const bk = oExpo(P(t, 34.6, 35.4));
     put($('bar'), P(t, 34.6, 35), `translateY(${(1 - bk) * 120}px)`);
