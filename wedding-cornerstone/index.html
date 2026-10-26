@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Black+Han+Sans&family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Gothic+A1:wght@500;700;800;900&display=swap">
 <style>
 /* Layout: one fixed 1080×1920 (9:16) stage scaled to fit; every frame is a pure function of time t, so the same page plays live and renders to video */
 :root {
@@ -15,15 +15,13 @@
   --page: #05091a;
   --page-ink: #d8d3c6;
   --page-muted: #7f879c;
-  --display-ko: "Black Han Sans", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+  --gothic: "Gothic A1", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
   --display-en: "Anton", "Impact", "Arial Narrow", sans-serif;
-  --serif: "Gowun Batang", "Nanum Myeongjo", "AppleMyungjo", serif;
-  --body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   color-scheme: dark;
 }
 html, body { background: var(--page); color: var(--page-ink); }
 body {
-  font-family: var(--body);
+  font-family: var(--gothic);
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 12px 20px;
@@ -31,8 +29,8 @@ body {
 }
 .wrap { max-width: 560px; margin-inline: auto; display: flex; flex-direction: column; gap: 10px; }
 .top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px; }
-.top h1 { margin: 0; font: 600 15px/1.3 var(--body); }
-.top p { margin: 0; font: 400 12px/1.4 var(--body); color: var(--page-muted); }
+.top h1 { margin: 0; font: 700 15px/1.3 var(--gothic); }
+.top p { margin: 0; font: 500 12px/1.4 var(--gothic); color: var(--page-muted); }
 
 .viewport {
   position: relative;
@@ -66,29 +64,31 @@ body {
 
 /* S1 intro */
 #c1 { left: 230px; top: 590px; width: 620px; height: 620px; border-radius: 50%; background: var(--cream); }
-#c1-mono { left: 0; top: 160px; width: 620px; text-align: center; color: var(--navy); font: 400 230px/1 var(--display-en); letter-spacing: -.01em; }
-#c1-year { left: 0; top: 400px; width: 620px; text-align: center; color: var(--coral); font: 400 74px/1 var(--display-en); letter-spacing: .32em; text-indent: .32em; }
-#s1-tag { top: 1390px; font: 400 46px/1 var(--display-en); letter-spacing: .34em; text-indent: .34em; color: var(--cream); }
-#s1-sub { top: 1470px; font: 500 34px/1 var(--body); letter-spacing: .3em; text-indent: .3em; color: var(--cream); opacity: .8; }
+#c1-mono { left: 0; top: 215px; width: 620px; text-align: center; color: var(--navy); font: 900 104px/1 var(--gothic); letter-spacing: -.03em; white-space: nowrap; }
+#c1-mono span { font: 400 92px/1 var(--display-en); color: var(--coral); margin: 0 .18em; }
+#c1-year { left: 0; top: 390px; width: 620px; text-align: center; color: var(--coral); font: 400 74px/1 var(--display-en); letter-spacing: .32em; text-indent: .32em; }
+#s1-tag { top: 1390px; font: 400 66px/1 var(--display-en); letter-spacing: .06em; text-indent: .06em; color: var(--cream); }
+#s1-sub { top: 1500px; font: 700 46px/1 var(--gothic); letter-spacing: .02em; color: var(--cream); opacity: .9; }
 
 /* S2–S3 cornerstone & building */
 #ref { top: 170px; color: var(--coral); font: 400 40px/1 var(--display-en); letter-spacing: .22em; text-indent: .22em; }
-#ref-ko { top: 228px; color: var(--navy); font: 500 30px/1 var(--body); letter-spacing: .2em; text-indent: .2em; opacity: .7; }
-.verse { top: 330px; left: 70px; width: 940px; text-align: center; color: var(--navy); font: 700 72px/1.42 var(--serif); letter-spacing: -.01em; }
-.verse.sm { font-size: 54px; }
+#ref-ko { top: 228px; color: var(--navy); font: 700 30px/1 var(--gothic); letter-spacing: .12em; text-indent: .12em; opacity: .7; }
+.verse { top: 330px; left: 70px; width: 940px; text-align: center; color: var(--navy); font: 800 68px/1.45 var(--gothic); letter-spacing: -.03em; }
+.verse.sm { font-size: 52px; }
 .verse .vn { display: block; margin-bottom: 18px; font: 400 32px/1 var(--display-en); letter-spacing: .18em; color: var(--coral); }
 .verse .w { display: inline-block; }
 .verse .hl { color: var(--coral); }
 #ground { left: 110px; top: 1560px; width: 860px; height: 8px; background: var(--navy); transform-origin: 0 50%; }
 .blk { width: 150px; height: 96px; background: var(--navy); border-radius: 3px; }
 .blk::after { content: ""; position: absolute; inset: 10px; border: 2px solid rgb(243 228 198 / .14); border-radius: 2px; }
-#corner { width: 150px; height: 96px; background: var(--coral); border-radius: 3px; color: var(--cream); text-align: center; padding-top: 14px; }
-#corner b { display: block; font: 400 34px/1 var(--display-ko); }
-#corner i { display: block; margin-top: 8px; font: 400 17px/1 var(--display-en); font-style: normal; letter-spacing: .14em; }
-#pulse { width: 150px; height: 96px; border: 5px solid var(--coral); border-radius: 6px; }
+#corner { height: 96px; background: var(--coral); border-radius: 3px; color: var(--cream); display: flex; align-items: center; justify-content: center; gap: 22px; }
+#corner b { font: 900 44px/1 var(--gothic); letter-spacing: .02em; }
+#corner i { font: 400 30px/1 var(--display-en); font-style: normal; letter-spacing: .2em; opacity: .85; }
+#pulse { height: 96px; border: 5px solid var(--coral); border-radius: 6px; }
 #roof { left: 130px; top: 900px; width: 820px; height: 244px; background: var(--navy); clip-path: polygon(50% 0, 100% 100%, 0 100%); transform-origin: 50% 100%; }
-#roof-txt { left: 0; top: 1060px; width: 1080px; text-align: center; font: 400 46px/1 var(--display-en); letter-spacing: .2em; text-indent: .2em; color: var(--cream); }
-#motto { top: 1640px; color: var(--navy); font: 700 50px/1.4 var(--serif); }
+#roof-txt { left: 0; top: 1060px; width: 1080px; text-align: center; font: 900 46px/1 var(--gothic); color: var(--cream); }
+#roof-txt span { font: 400 42px/1 var(--display-en); color: var(--coral); margin: 0 .25em; }
+#motto { top: 1640px; color: var(--navy); font: 800 50px/1.4 var(--gothic); letter-spacing: -.02em; }
 #motto span { color: var(--coral); }
 #wipe { left: 540px; top: 1300px; width: 100px; height: 100px; margin: -50px 0 0 -50px; border-radius: 50%; background: var(--navy); }
 
@@ -102,14 +102,13 @@ body {
   padding: 44px 56px;
   box-shadow: 0 30px 0 -6px rgb(0 0 0 / .35);
 }
-.card .role { font: 400 30px/1 var(--display-en); letter-spacing: .24em; color: var(--coral); }
-.card .role span { font: 500 28px/1 var(--body); letter-spacing: .1em; margin-left: 14px; color: var(--cream); opacity: .7; }
-.card .ko { margin-top: 22px; font: 400 156px/1 var(--display-ko); color: var(--cream); letter-spacing: .02em; }
-.card .en { position: absolute; right: 56px; bottom: 48px; font: 400 64px/1 var(--display-en); color: var(--coral); letter-spacing: .03em; }
+.card .role { font: 400 34px/1 var(--display-en); letter-spacing: .24em; color: var(--coral); }
+.card .ko { margin-top: 26px; font: 900 132px/1 var(--gothic); color: var(--cream); letter-spacing: -.01em; }
+.card .en { position: absolute; right: 56px; bottom: 50px; font: 400 58px/1 var(--display-en); color: var(--coral); letter-spacing: .03em; }
 #card-g { top: 470px; }
 #card-b { top: 1000px; }
 #amp { left: 465px; top: 795px; width: 150px; height: 150px; border-radius: 50%; background: var(--cream); color: var(--navy); text-align: center; font: 400 96px/150px var(--display-en); z-index: 3; }
-#s4-copy { top: 1450px; font: 700 48px/1.55 var(--serif); color: var(--cream); }
+#s4-copy { top: 1420px; font: 700 46px/1.6 var(--gothic); letter-spacing: -.02em; color: var(--cream); }
 #s4-copy span { color: var(--coral); }
 
 /* folding doors */
@@ -132,31 +131,31 @@ body {
 #dig-d { top: 880px; }
 .dlab { left: 640px; }
 .dlab b { display: block; font: 400 150px/1 var(--display-en); color: var(--coral); }
-.dlab span { display: block; margin-top: 14px; font: 400 58px/1 var(--display-ko); color: var(--cream); }
+.dlab span { display: block; margin-top: 14px; font: 900 58px/1 var(--gothic); color: var(--cream); }
 #lab-m { top: 560px; }
 #lab-d { top: 1040px; }
 #d-rule { left: 90px; top: 1420px; width: 900px; height: 6px; background: var(--cream); transform-origin: 0 50%; }
 #d-time { left: 90px; top: 1480px; font: 400 170px/1 var(--display-en); color: var(--cream); }
-#d-time-ko { left: 90px; top: 1680px; font: 400 60px/1 var(--display-ko); color: var(--cream); opacity: .85; }
+#d-time-ko { left: 90px; top: 1680px; font: 900 60px/1 var(--gothic); color: var(--cream); opacity: .85; }
 
 /* S6–S7 arch */
 #s6-head { top: 290px; font: 400 110px/1 var(--display-en); letter-spacing: .14em; text-indent: .14em; color: var(--cream); }
-#s6-head-ko { top: 420px; font: 500 34px/1 var(--body); letter-spacing: .3em; text-indent: .3em; color: var(--cream); opacity: .75; }
+#s6-head-ko { top: 420px; font: 700 36px/1 var(--gothic); letter-spacing: .2em; text-indent: .2em; color: var(--cream); opacity: .75; }
 #arch { left: 110px; width: 860px; background: var(--cream); border-radius: 430px 430px 0 0; overflow: hidden; color: var(--navy); }
 #arch .band { position: absolute; left: 0; right: 0; bottom: 0; height: 120px;
   background: repeating-linear-gradient(135deg, var(--coral) 0 28px, #c84a2f 28px 56px); }
 .in { position: absolute; left: 0; width: 860px; text-align: center; }
 #v-lab { top: 250px; font: 400 36px/1 var(--display-en); letter-spacing: .26em; text-indent: .26em; color: var(--coral); }
-#v-1 { top: 330px; font: 400 150px/1.05 var(--display-ko); }
-#v-2 { top: 490px; font: 400 150px/1.05 var(--display-ko); }
+#v-1 { top: 330px; font: 900 150px/1.05 var(--gothic); }
+#v-2 { top: 490px; font: 900 150px/1.05 var(--gothic); }
 #v-rule { left: 230px; width: 400px; top: 700px; height: 6px; background: var(--navy); }
-#v-3 { top: 750px; font: 400 96px/1 var(--display-ko); color: var(--coral); }
+#v-3 { top: 750px; font: 900 96px/1 var(--gothic); color: var(--coral); }
 #v-4 { top: 880px; font: 400 40px/1 var(--display-en); letter-spacing: .2em; text-indent: .2em; }
 
-#f-lab { top: 150px; font: 400 40px/1 var(--display-en); letter-spacing: .3em; text-indent: .3em; }
-#f-g { top: 240px; font: 400 168px/1 var(--display-ko); }
+#f-lab { top: 150px; font: 400 50px/1 var(--display-en); letter-spacing: .05em; text-indent: .05em; }
+#f-g { top: 240px; font: 900 168px/1 var(--gothic); }
 #f-amp { top: 418px; font: 400 92px/1 var(--display-en); color: var(--coral); }
-#f-b { top: 520px; font: 400 168px/1 var(--display-ko); }
+#f-b { top: 520px; font: 900 168px/1 var(--gothic); }
 #f-en { top: 718px; font: 400 44px/1 var(--display-en); letter-spacing: .08em; color: var(--coral); }
 #f-house { left: 0; top: 800px; width: 860px; height: 210px; }
 .mb { position: absolute; width: 64px; height: 40px; background: var(--navy); border-radius: 2px; }
@@ -166,14 +165,13 @@ body {
 
 #bar { left: 110px; top: 1480px; width: 860px; height: 170px; display: flex; border-radius: 4px; overflow: hidden; }
 #bar > div { display: flex; flex-direction: column; justify-content: center; }
-#bar .arrow { width: 130px; background: var(--navy-deep); color: var(--cream); align-items: center; font: 400 70px/1 var(--display-en); }
-#bar .when { width: 330px; background: var(--cream); color: var(--navy); padding-left: 30px; gap: 12px; }
-#bar .when b { font: 400 44px/1 var(--display-en); letter-spacing: .02em; white-space: nowrap; }
-#bar .when span { font: 600 28px/1 var(--body); }
-#bar .where { flex: 1; background: var(--coral); color: var(--cream); padding-left: 26px; gap: 12px; }
-#bar .where b { font: 400 38px/1 var(--display-ko); }
-#bar .where span { font: 600 28px/1 var(--body); }
-#f-motto { top: 1700px; font: 700 38px/1.5 var(--serif); color: var(--cream); }
+#bar .when { width: 400px; background: var(--cream); color: var(--navy); padding-left: 30px; gap: 12px; }
+#bar .when b { font: 400 50px/1 var(--display-en); letter-spacing: .02em; white-space: nowrap; }
+#bar .when span { font: 700 30px/1 var(--gothic); }
+#bar .where { flex: 1; background: var(--coral); color: var(--cream); padding-left: 32px; gap: 12px; }
+#bar .where b { font: 900 36px/1 var(--gothic); letter-spacing: -.02em; }
+#bar .where span { font: 700 30px/1 var(--gothic); }
+#f-motto { top: 1700px; font: 700 38px/1.5 var(--gothic); letter-spacing: -.02em; color: var(--cream); }
 
 .marq { position: absolute; left: 0; top: 0; height: 64px; overflow: hidden; background: var(--navy-deep); z-index: 30; white-space: nowrap; transform-origin: 0 0; }
 .marq .track { display: inline-flex; font: 400 30px/64px var(--display-en); letter-spacing: .14em; color: var(--cream); }
@@ -188,12 +186,12 @@ body {
 .ctrl button {
   flex: none; min-width: 44px; height: 36px; padding: 0 12px;
   border: 1px solid #2a3350; border-radius: 4px;
-  background: #0c1430; color: var(--page-ink); font: 500 13px/1 var(--body); cursor: pointer;
+  background: #0c1430; color: var(--page-ink); font: 500 13px/1 var(--gothic); cursor: pointer;
 }
 .ctrl button:hover { border-color: var(--coral); }
 .ctrl button:focus-visible, .ctrl input:focus-visible { outline: 2px solid var(--coral); outline-offset: 2px; }
 .ctrl input[type=range] { flex: 1; min-width: 0; accent-color: var(--coral); }
-.ctrl output { flex: none; font: 500 12px/1 var(--body); color: var(--page-muted); font-variant-numeric: tabular-nums; width: 76px; text-align: right; }
+.ctrl output { flex: none; font: 500 12px/1 var(--gothic); color: var(--page-muted); font-variant-numeric: tabular-nums; width: 76px; text-align: right; }
 
 /* render mode: bare stage at 1:1 for frame capture */
 body.render { margin: 0; padding: 0; background: var(--navy); }
@@ -214,11 +212,11 @@ body.render .viewport { width: 1080px; height: 1920px; border-radius: 0; aspect-
 
       <!-- S1 -->
       <div class="a" id="c1">
-        <div class="a" id="c1-mono">H&amp;P</div>
+        <div class="a" id="c1-mono">현철<span>&amp;</span>서영</div>
         <div class="a" id="c1-year">2027</div>
       </div>
-      <div class="a center" id="s1-tag">WEDDING INVITATION</div>
-      <div class="a center" id="s1-sub">결혼합니다</div>
+      <div class="a center" id="s1-tag">We're getting married!</div>
+      <div class="a center" id="s1-sub">저희, 결혼합니다.</div>
 
       <!-- S2–S3 -->
       <div class="a center" id="ref">EPHESIANS 2:20–22</div>
@@ -231,24 +229,24 @@ body.render .viewport { width: 1080px; height: 1920px; border-radius: 0; aspect-
       <div class="a" id="pulse"></div>
       <div class="a" id="corner"><b>모퉁잇돌</b><i>CORNERSTONE</i></div>
       <div class="a" id="roof"></div>
-      <div class="a" id="roof-txt">HA ♥ PARK</div>
+      <div class="a" id="roof-txt">현철<span>&amp;</span>서영</div>
       <div class="a center" id="motto">그 위에, <span>하나씩</span>. 단단히.</div>
       <div class="a" id="wipe"></div>
 
       <!-- S4 -->
       <div class="a center" id="s4-head">WE'RE GETTING MARRIED</div>
       <div class="a card" id="card-g">
-        <div class="role">GROOM<span>신랑</span></div>
+        <div class="role">GROOM</div>
         <div class="ko">하현철</div>
-        <div class="en">JAME HA</div>
+        <div class="en">JAMES HA</div>
       </div>
       <div class="a" id="amp">&amp;</div>
       <div class="a card" id="card-b">
-        <div class="role">BRIDE<span>신부</span></div>
+        <div class="role">BRIDE</div>
         <div class="ko">박서영</div>
         <div class="en">HANNAH PARK</div>
       </div>
-      <div class="a center" id="s4-copy">모퉁잇돌 되신 예수 그리스도 위에<br><span>하나씩 세워져 가는</span> 저희 가정에 초대합니다</div>
+      <div class="a center" id="s4-copy">모퉁잇돌 되신 예수 그리스도 위에<br><span>하나씩 세워져 가는</span> 저희 가정의<br>첫 시작에 초대합니다</div>
 
       <!-- doors -->
       <div class="a door" id="door-l"><div class="dt">SAVE<small>2027</small></div><div class="shade"></div></div>
@@ -276,16 +274,15 @@ body.render .viewport { width: 1080px; height: 1920px; border-radius: 0; aspect-
         <div class="a in" id="v-3">1층 컨퍼런스홀</div>
         <div class="a in" id="v-4">1F CONFERENCE HALL</div>
 
-        <div class="a in" id="f-lab">WEDDING INVITATION</div>
+        <div class="a in" id="f-lab">We're getting married!</div>
         <div class="a in" id="f-g">하현철</div>
         <div class="a in" id="f-amp">&amp;</div>
         <div class="a in" id="f-b">박서영</div>
-        <div class="a in" id="f-en">JAME HA &amp; HANNAH PARK</div>
+        <div class="a in" id="f-en">JAMES HA &amp; HANNAH PARK</div>
         <div class="a in" id="f-house"><div id="m-roof"></div></div>
         <div class="a in" id="f-ref">EPHESIANS 2:20–22</div>
       </div>
       <div class="a" id="bar">
-        <div class="arrow">→</div>
         <div class="when"><b>2027.02.20 SAT</b><span>오후 12시 30분</span></div>
         <div class="where"><b>한국거래소 서울사무소</b><span>1층 컨퍼런스홀</span></div>
       </div>
@@ -402,15 +399,14 @@ const COLS = 5, ROWS = 4, BW = 150, BH = 96, GAP = 8, GY = 1560;
 const X0 = (W - (COLS * BW + (COLS - 1) * GAP)) / 2;
 const bx = c => X0 + c * (BW + GAP), by = r => GY - BH - r * (BH + GAP);
 const blocks = [];
-for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
-  if (r === 0 && c === 0) continue;
+for (let r = 1; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
   const el = document.createElement('div');
   el.className = 'a blk';
   el.style.left = bx(c) + 'px'; el.style.top = by(r) + 'px';
   $('blocks').append(el);
-  blocks.push({ el, start: 10.9 + blocks.length * .24 });
+  blocks.push({ el, start: 10.9 + blocks.length * .3 });
 }
-for (const id of ['corner', 'pulse']) { $(id).style.left = bx(0) + 'px'; $(id).style.top = by(0) + 'px'; }
+for (const id of ['corner', 'pulse']) { const e = $(id).style; e.left = X0 + 'px'; e.top = by(0) + 'px'; e.width = (bx(COLS - 1) + BW - X0) + 'px'; }
 $('roof').style.top = (by(ROWS - 1) - 8 - 244) + 'px';
 $('roof-txt').style.top = (by(ROWS - 1) - 8 - 80) + 'px';
 
@@ -418,7 +414,7 @@ $('roof-txt').style.top = (by(ROWS - 1) - 8 - 80) + 'px';
 const mini = [];
 for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) {
   const el = document.createElement('div');
-  el.className = 'mb' + (r === 0 && c === 0 ? ' c' : '');
+  el.className = 'mb' + (r === 0 ? ' c' : '');
   el.style.left = (334 + c * 66) + 'px';
   el.style.top = (170 - 40 - r * 44) + 'px';
   $('f-house').append(el);
@@ -442,7 +438,7 @@ document.querySelectorAll('.digits').forEach((d, di) => {
 });
 
 // ---------- build: marquees ----------
-const MQ = '<span>JAME <em>♥</em> HANNAH</span><span>2027.02.20</span><span>하현철 <em>·</em> 박서영</span><span>EPHESIANS 2:20–22</span>';
+const MQ = '<span>JAMES <em>♥</em> HANNAH</span><span>2027.02.20</span><span>하현철 <em>·</em> 박서영</span><span>EPHESIANS 2:20–22</span>';
 const marqs = ['mq-t', 'mq-b', 'mq-l', 'mq-r'].map((id, i) => {
   const tr = $(id).querySelector('.track');
   tr.innerHTML = MQ;
@@ -487,7 +483,7 @@ function render(t) {
     const shake = t > 5.9 && t < 6.3 ? Math.sin((t - 5.9) * 70) * 9 * (1 - P(t, 5.9, 6.3)) : 0;
     put($('corner'), o * Math.min(1, d * 5), `translateY(${-760 * (1 - oBack(d, 1.1)) + shake}px)`);
     const pk = P(t, 5.9, 6.7);
-    put($('pulse'), o * (pk > 0 && pk < 1 ? 1 - pk : 0), `scale(${1 + oCubic(pk) * 1.4})`);
+    put($('pulse'), o * (pk > 0 && pk < 1 ? 1 - pk : 0), `scale(${1 + oCubic(pk) * .12}, ${1 + oCubic(pk) * 1.1})`);
 
     blocks.forEach(b => {
       const k = P(t, b.start, b.start + .5);
@@ -653,7 +649,7 @@ if (isRender) document.body.classList.add('render');
 // Korean faces arrive as unicode-range slices: request every glyph the film uses before the first frame
 const glyphs = [...new Set(stage.textContent.replace(/\s+/g, ''))].join('') + '0123456789';
 const fontsReady = Promise.all([
-  '400 100px Anton', '400 100px "Black Han Sans"', '700 60px "Gowun Batang"', '500 30px "IBM Plex Sans KR"', '600 30px "IBM Plex Sans KR"'
+  '400 100px Anton', '500 30px "Gothic A1"', '700 30px "Gothic A1"', '800 30px "Gothic A1"', '900 30px "Gothic A1"'
 ].map(f => document.fonts.load(f, glyphs).catch(() => {}))).then(() => document.fonts.ready);
 
 fontsReady.then(() => {
