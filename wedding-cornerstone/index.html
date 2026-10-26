@@ -70,9 +70,8 @@ body {
 
 /* S1 intro */
 #c1 { left: 230px; top: 590px; width: 620px; height: 620px; border-radius: 50%; background: var(--cream); }
-#c1-mono { left: 0; top: 215px; width: 620px; text-align: center; color: var(--navy); font: 700 124px/1 var(--display-ko); white-space: nowrap; }
-#c1-mono span { font: 400 92px/1 var(--display-en); color: var(--coral); margin: 0 .18em; }
-#c1-year { left: 0; top: 390px; width: 620px; text-align: center; color: var(--coral); font: 400 74px/1 var(--display-en); letter-spacing: .32em; text-indent: .32em; }
+#c1-mono { left: 0; top: 240px; width: 620px; text-align: center; color: var(--navy); font: 400 118px/1 var(--display-en); letter-spacing: .01em; white-space: nowrap; }
+#c1-year { left: 0; top: 388px; width: 620px; text-align: center; color: var(--coral); font: 400 62px/1 var(--display-en); letter-spacing: .16em; text-indent: .16em; }
 #s1-tag { top: 1390px; font: 400 66px/1 var(--display-en); letter-spacing: .06em; text-indent: .06em; color: var(--cream); }
 #s1-sub { top: 1494px; font: 700 48px/1 var(--gothic); letter-spacing: -.01em; color: var(--cream); }
 
@@ -85,15 +84,15 @@ body {
 .verse .w { display: inline-block; }
 .verse .hl { color: var(--coral); }
 #ground { left: 110px; top: 1560px; width: 860px; height: 8px; background: var(--navy); transform-origin: 0 50%; }
-.blk { width: 150px; height: 96px; background: var(--navy); border-radius: 3px; }
-.blk::after { content: ""; position: absolute; inset: 10px; border: 2px solid rgb(243 228 198 / .14); border-radius: 2px; }
-#corner { height: 96px; background: var(--coral); border-radius: 3px; color: var(--cream); display: flex; align-items: center; justify-content: center; gap: 22px; }
+.blk { width: 150px; height: 96px; background: var(--navy); border-radius: 14px; }
+.blk::after { content: ""; position: absolute; inset: 10px; border: 2px solid color-mix(in srgb, var(--cream) 14%, transparent); border-radius: 8px; }
+#corner { height: 96px; background: var(--coral); border-radius: 14px; color: var(--cream); display: flex; align-items: center; justify-content: center; gap: 22px; }
 #corner b { font: 700 52px/1 var(--display-ko); }
 #corner i { font: 400 30px/1 var(--display-en); font-style: normal; letter-spacing: .2em; opacity: .85; }
-#pulse { height: 96px; border: 5px solid var(--coral); border-radius: 6px; }
-#roof { left: 130px; top: 900px; width: 820px; height: 244px; background: var(--navy); clip-path: polygon(50% 0, 100% 100%, 0 100%); transform-origin: 50% 100%; }
-#roof-txt { left: 0; top: 1054px; width: 1080px; text-align: center; font: 700 58px/1 var(--display-ko); color: var(--cream); }
-#roof-txt span { color: var(--coral); margin: 0 .2em; }
+#pulse { height: 96px; border: 5px solid var(--coral); border-radius: 18px; }
+#roof { left: 149px; top: 814px; width: 782px; height: 330px; background: var(--navy); border-radius: 391px 391px 0 0 / 330px 330px 0 0; transform-origin: 50% 100%; }
+/* gable: a cross, and two doves (the Spirit, Eph 2:22) turned toward it */
+#roof-art { left: 149px; width: 782px; height: 330px; overflow: visible; color: var(--cream); }
 #motto { top: 1640px; color: var(--navy); font: 800 52px/1.4 var(--gothic); letter-spacing: -.03em; }
 #motto span { color: var(--coral); }
 #wipe { left: 540px; top: 1300px; width: 100px; height: 100px; margin: -50px 0 0 -50px; border-radius: 50%; background: var(--navy); }
@@ -164,9 +163,9 @@ body {
 #f-b { top: 516px; font: 700 178px/1 var(--display-ko); }
 #f-en { top: 718px; font: 400 44px/1 var(--display-en); letter-spacing: .08em; color: var(--coral); }
 #f-house { left: 0; top: 790px; width: 860px; height: 230px; }
-.mb { position: absolute; width: 64px; height: 34px; background: var(--navy); border-radius: 2px; }
+.mb { position: absolute; width: 64px; height: 34px; background: var(--navy); border-radius: 6px; }
 .mb.c { background: var(--coral); }
-#m-roof { position: absolute; left: 318px; top: 0; width: 224px; height: 60px; background: var(--navy); clip-path: polygon(50% 0, 100% 100%, 0 100%); transform-origin: 50% 100%; }
+#m-roof { position: absolute; left: 330px; top: 0; width: 200px; height: 80px; background: var(--navy); border-radius: 100px 100px 0 0 / 80px 80px 0 0; transform-origin: 50% 100%; }
 #f-ref { top: 1045px; font: 400 30px/1 var(--display-en); letter-spacing: .2em; text-indent: .2em; opacity: .7; }
 
 #bar { left: 110px; top: 1480px; width: 860px; height: 170px; display: flex; border-radius: 4px; overflow: hidden; }
@@ -218,8 +217,8 @@ body.render .viewport { width: 1080px; height: 1920px; border-radius: 0; aspect-
 
       <!-- S1 -->
       <div class="a" id="c1">
-        <div class="a" id="c1-mono">현철<span>&amp;</span>서영</div>
-        <div class="a" id="c1-year">2027</div>
+        <div class="a" id="c1-mono">2027.02.20</div>
+        <div class="a" id="c1-year">Saturday</div>
       </div>
       <div class="a center" id="s1-tag">We're getting married!</div>
       <div class="a center" id="s1-sub">저희, 결혼합니다.</div>
@@ -235,7 +234,24 @@ body.render .viewport { width: 1080px; height: 1920px; border-radius: 0; aspect-
       <div class="a" id="pulse"></div>
       <div class="a" id="corner"><b>모퉁잇돌</b><i>CORNERSTONE</i></div>
       <div class="a" id="roof"></div>
-      <div class="a" id="roof-txt">현철<span>&amp;</span>서영</div>
+      <svg class="a" id="roof-art" viewBox="0 0 782 330" aria-hidden="true">
+        <defs>
+          <g id="dove">
+            <g fill="currentColor">
+              <path d="M-26 0 L-58 -10 L-60 6 L-50 12 L-24 10 Z"/>
+              <ellipse cx="0" cy="2" rx="31" ry="15" transform="rotate(-14)"/>
+              <path d="M-6 -8 C-10 -34 -28 -52 -50 -58 C-42 -40 -32 -20 -22 -2 Z"/>
+              <path d="M4 -10 C6 -38 -2 -60 -16 -74 C-18 -48 -16 -26 -10 -4 Z"/>
+              <circle cx="27" cy="-12" r="11"/>
+            </g>
+            <path style="fill: var(--coral)" d="M36 -14 L48 -9 L36 -6 Z"/>
+            <circle style="fill: var(--navy)" cx="30" cy="-14" r="2.2"/>
+          </g>
+        </defs>
+        <g id="cross" fill="currentColor"><rect x="380" y="128" width="22" height="156" rx="3"/><rect x="346" y="164" width="90" height="22" rx="3"/></g>
+        <g id="dove-l"><use href="#dove"/></g>
+        <g id="dove-r"><use href="#dove"/></g>
+      </svg>
       <div class="a center" id="motto">그 위에, <span>하나씩</span>. 단단히.</div>
       <div class="a" id="wipe"></div>
 
@@ -413,8 +429,8 @@ for (let r = 1; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
   blocks.push({ el, start: 10.9 + blocks.length * .3 });
 }
 for (const id of ['corner', 'pulse']) { const e = $(id).style; e.left = X0 + 'px'; e.top = by(0) + 'px'; e.width = (bx(COLS - 1) + BW - X0) + 'px'; }
-$('roof').style.top = (by(ROWS - 1) - 8 - 244) + 'px';
-$('roof-txt').style.top = (by(ROWS - 1) - 8 - 80) + 'px';
+$('roof').style.top = (by(ROWS - 1) - 8 - 330) + 'px';
+$('roof-art').style.top = (by(ROWS - 1) - 8 - 330) + 'px';
 
 // mini house for the final poster (callback to the cornerstone scene)
 const mini = [];
@@ -429,7 +445,7 @@ for (let r = 0; r < 4; r++) for (let c = 0; c < (r ? 3 : 1); c++) {
   $('f-house').append(el);
   mini.push(el);
 }
-$('m-roof').style.top = (MBASE - 4 * MB - 3 * MG - MG - 60) + 'px';
+$('m-roof').style.top = (MBASE - 4 * MB - 3 * MG - MG - 80) + 'px';
 
 // ---------- build: rolling digits ----------
 const rolls = [];
@@ -500,7 +516,19 @@ function render(t) {
     });
     const rk = P(t, 15.8, 16.4);
     put($('roof'), o * Math.min(1, rk * 4), `translateY(${-300 * (1 - oBack(rk, 1.2))}px)`);
-    put($('roof-txt'), o * P(t, 16.4, 16.9), `translateY(${(1 - oCubic(P(t, 16.4, 17))) * 20}px)`);
+    put($('roof-art'), o * (t >= 16.3 ? 1 : 0), '');
+    const ck = P(t, 16.3, 16.8);
+    $('cross').setAttribute('opacity', ck.toFixed(3));
+    $('cross').setAttribute('transform', `translate(0 ${((1 - oBack(ck, 1.6)) * 30).toFixed(2)})`);
+    // doves glide in from each side and settle facing the cross
+    const dk = oCubic(P(t, 16.6, 17.3)), bob = Math.sin(t * 5) * 3 * dk;
+    const dove = (id, x, dir) => {
+      const g = $(id);
+      g.setAttribute('opacity', Math.min(1, dk * 3).toFixed(3));
+      g.setAttribute('transform', `translate(${(x - dir * 160 * (1 - dk)).toFixed(2)} ${(250 - 50 * (1 - dk) + bob).toFixed(2)}) scale(${dir * 1.25} 1.25)`);
+    };
+    dove('dove-l', 252, 1);
+    dove('dove-r', 530, -1);
     put($('motto'), o * P(t, 12.0, 12.7), `translateY(${(1 - oCubic(P(t, 12, 12.8))) * 30}px)`);
 
     // verses, word by word
