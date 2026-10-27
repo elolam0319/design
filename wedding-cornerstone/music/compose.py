@@ -4,7 +4,7 @@ Everything is synthesized here (no samples), so the track is ours to use. Cues f
 film's timeline in index.html: the cornerstone lands at 5.9 s, each block lands on an
 eighth note from 11.4 s, the doors shut on the bar line at 24.0 s, the digits roll at 25 s.
 
-usage: python compose.py out.wav [--hymn | --love]
+usage: python compose.py out.wav [--hymn | --love | --joy]
 
 --hymn sets AURELIA (S. S. Wesley, 1864, public domain; "The Church's One Foundation",
 새찬송가 "교회의 참된 터는") as the melody instead of the original tune. Its eight lines of
@@ -16,6 +16,10 @@ still needs checking against a printed score.
 "완전한 사랑") after a two-bar intro: four lines of three bars, then a two-bar coda.
 Line one follows the published incipit (1-3-5-5-5-5-5-1-7-7-6-2-3-4-5); the rest is
 written from memory and needs checking against a printed score.
+
+--joy sets ANTIOCH (arr. L. Mason, 1839, public domain; "Joy to the World", 찬송가
+"기쁘다 구주 오셨네") from bar 3: the whole tune over ten bars, then its last three
+phrases again as a softer coda that lands on the film's final chord. Written from memory.
 """
 import sys
 import wave
@@ -24,6 +28,7 @@ import numpy as np
 
 HYMN = '--hymn' in sys.argv
 LOVE = '--love' in sys.argv
+JOY = '--joy' in sys.argv
 SR = 44100
 DUR = 38.0
 BEAT = 0.6           # 100 BPM
@@ -158,6 +163,17 @@ if LOVE:
         (12, 1, 'Em', 2), (12, 3, 'A', 2), (13, 1, 'G', 2), (13, 3, 'A', 2), (14, 1, 'A', 1), (14, 2, 'D', 3),
         (15, 1, 'G', 2), (15, 3, 'A', 2), (16, 1, 'A', 2), (16, 3, 'D', 3),
     ]
+if JOY:
+    PROG = [
+        (1, 1, 'Dmaj9', 8),
+        (3, 1, 'D', 4), (4, 1, 'D', 1), (4, 2, 'A', 1), (4, 3, 'D', 2),     # Joy to the world, the Lord is come
+        (5, 1, 'G', 2), (5, 3, 'A', 2), (6, 1, 'D', 4),                     # Let earth receive her King
+        (7, 1, 'D', 4), (8, 1, 'D', 4),                                     # Let every heart / And heaven and nature sing
+    ]
+    for b in (9, 13):                                                       # And heaven and nature sing (x2), And heaven, and heaven...
+        PROG += [(b, 1, 'D', 2), (b, 3, 'A', 2), (b + 1, 1, 'A7', 4), (b + 2, 1, 'D', 2), (b + 2, 3, 'G', 2)]
+    PROG += [(12, 1, 'D/F#', 1), (12, 2, 'A', 1), (12, 3, 'D', 2),
+             (16, 1, 'D/F#', 1), (16, 2, 'A', 1), (16, 3, 'D', 3)]
 for bar, beat, name, beats in PROG:
     b, up = CH[name]
     t0, d = at(bar, beat), beats * BEAT
@@ -218,12 +234,28 @@ if LOVE:
         12: q(64, 66, 67, 69), 13: q(67, 66, 64, 62), 14: [(1, 61, 1), (2, 62, 3)],  # Whom Thou forevermore dost join in one
         15: q(67, 66, 64, 62), 16: [(1, 61, 2), (3, 62, 3)],            # coda: ...join in one
     }
+if JOY:
+    # ANTIOCH in D, (midi, beats); each phrase's last note leaves room for the next pickup
+    J1 = [(74, 1), (73, .75), (71, .25), (69, 1.5), (67, .5), (66, 1), (64, 1), (62, 1.5), (69, .5)]
+    J2 = [(71, 1.5), (71, .5), (73, 1.5), (73, .5), (74, 3.5), (74, .5)]
+    J3 = [(74, .5), (73, .5), (71, .5), (69, .5), (69, .75), (67, .25), (66, .5), (74, .5)]
+    J4 = [(74, .5), (73, .5), (71, .5), (69, .5), (69, .75), (67, .25), (66, .5), (66, .5)]
+    J5 = [(66, .5), (66, .5), (66, .5), (66, .25), (67, .25), (69, 1.5), (67, .5)]
+    J6 = [(66, .5), (64, .5), (64, .5), (64, .25), (66, .25), (67, 1.5), (66, .5)]
+    J7 = [(74, 1), (71, .5), (69, .75), (67, .25), (66, .5), (67, .5), (66, 1), (64, 1), (62, 2.5)]
+    MEL = {}
+    for start, phrases in ((3, J1 + J2 + J3 + J4 + J5 + J6 + J7), (13, J5 + J6 + J7)):
+        c = 0.0
+        for m, d in phrases:
+            MEL.setdefault(start + int(c // 4), []).append((1 + c % 4, m, d))
+            c += d
 for bar, notes in MEL.items():
     for beat, m, beats in notes:
         if HYMN and bar <= 2:                       # the opening line rings out on bells
             add('bell', at(bar, beat), bell(m + 12, 0.32, 1.6))
         else:
-            add('piano', at(bar, beat), piano(m + (12 if HYMN or LOVE else 0), beats * BEAT, 0.5 if bar >= 15 and LOVE else 0.62))
+            soft = (LOVE and bar >= 15) or (JOY and bar >= 13)
+            add('piano', at(bar, beat), piano(m + (12 if HYMN or LOVE or JOY else 0), beats * BEAT, 0.5 if soft else 0.62))
 
 # ---------- drums: names, date, finale ----------
 for bar in (9, 10, 11, 12, 15, 16):
