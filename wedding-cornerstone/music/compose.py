@@ -4,13 +4,20 @@ Everything is synthesized here (no samples), so the track is ours to use. Cues f
 film's timeline in index.html: the cornerstone lands at 5.9 s, each block lands on an
 eighth note from 11.4 s, the doors shut on the bar line at 24.0 s, the digits roll at 25 s.
 
-usage: python compose.py out.wav
+usage: python compose.py out.wav [--hymn]
+
+--hymn sets AURELIA (S. S. Wesley, 1864, public domain; "The Church's One Foundation",
+새찬송가 "교회의 참된 터는") as the melody instead of the original tune. Its eight lines of
+two bars each fill the film's sixteen bars. Only the opening phrase was checked against a
+published incipit (3-3-3-4-3-3-2-1-1-6-5-4-3-4-5); the rest is written from memory and
+still needs checking against a printed score.
 """
 import sys
 import wave
 
 import numpy as np
 
+HYMN = '--hymn' in sys.argv
 SR = 44100
 DUR = 38.0
 BEAT = 0.6           # 100 BPM
@@ -112,6 +119,7 @@ CH = {  # bass, upper voicing
     'Bm': (35, [62, 66, 71]), 'G': (43, [62, 67, 71]), 'Em7': (40, [62, 64, 67, 71]),
     'A': (45, [61, 64, 69]), 'D/F#': (42, [62, 66, 69]), 'Gmaj7': (43, [66, 67, 71, 74]),
     'A/G': (43, [61, 64, 69]), 'F#m7': (42, [64, 66, 69, 73]), 'Asus': (45, [62, 64, 69]),
+    'Em': (40, [64, 67, 71]), 'A7': (45, [61, 64, 67]),
 }
 # (bar, beat, chord, beats)
 PROG = [
@@ -123,6 +131,17 @@ PROG = [
     (13, 1, 'G', 4), (14, 1, 'A/G', 2), (14, 3, 'F#m7', 2),
     (15, 1, 'Gmaj7', 4), (16, 1, 'A', 2), (16, 3, 'D', 3),
 ]
+if HYMN:
+    PROG = [
+        (1, 1, 'D', 6), (2, 3, 'A', 2),                      # The church's one foundation
+        (3, 1, 'D', 2), (3, 3, 'G', 2), (4, 1, 'Em', 2), (4, 3, 'D', 2),   # Is Jesus Christ her Lord
+        (5, 1, 'G', 4), (6, 1, 'A7', 2), (6, 3, 'D', 2),     # She is His new creation
+        (7, 1, 'D', 2), (7, 3, 'Bm', 2), (8, 1, 'A', 2), (8, 3, 'D', 2),  # By water and the word
+        (9, 1, 'D', 2), (9, 3, 'G', 2), (10, 1, 'D', 2), (10, 3, 'A', 2),  # From heav'n He came...
+        (11, 1, 'G', 4), (12, 1, 'D', 2), (12, 3, 'A', 2),   # To be His holy bride
+        (13, 1, 'D', 2), (13, 3, 'Bm', 2), (14, 1, 'A', 2), (14, 3, 'D', 2),  # With His own blood...
+        (15, 1, 'G', 2), (15, 3, 'D/F#', 2), (16, 1, 'A', 2), (16, 3, 'D', 3),  # And for her life He died
+    ]
 for bar, beat, name, beats in PROG:
     b, up = CH[name]
     t0, d = at(bar, beat), beats * BEAT
@@ -159,9 +178,25 @@ MEL = {
     15: [(1, 78, 1.5), (2.5, 79, .5), (3, 81, 2)],
     16: [(1, 79, 1), (2, 76, 1), (3, 78, 3)],
 }
+if HYMN:
+    # AURELIA in D: 1=D4(62) 2=64 3=66 4=67 5=69 6=71 7=73 8=74
+    q = lambda *ms: [(1 + i, m, 1) for i, m in enumerate(ms)]
+    MEL = {
+        1: q(66, 66, 66, 67), 2: [(1, 66, 1), (2, 66, 1), (3, 64, 2)],
+        3: q(62, 62, 71, 69), 4: [(1, 67, 2), (3, 66, 2)],
+        5: q(67, 69, 71, 69), 6: [(1, 69, 1), (2, 67, 1), (3, 66, 2)],
+        7: q(66, 66, 64, 62), 8: [(1, 61, 2), (3, 62, 2)],
+        9: q(69, 69, 69, 71), 10: [(1, 69, 1), (2, 74, 1), (3, 73, 2)],
+        11: q(71, 71, 69, 67), 12: [(1, 66, 2), (3, 64, 2)],
+        13: q(66, 67, 69, 74), 14: [(1, 73, 1), (2, 71, 1), (3, 69, 2)],
+        15: q(71, 69, 67, 66), 16: [(1, 64, 2), (3, 62, 3)],
+    }
 for bar, notes in MEL.items():
     for beat, m, beats in notes:
-        add('piano', at(bar, beat), piano(m, beats * BEAT, 0.62))
+        if HYMN and bar <= 2:                       # the opening line rings out on bells
+            add('bell', at(bar, beat), bell(m + 12, 0.32, 1.6))
+        else:
+            add('piano', at(bar, beat), piano(m + (12 if HYMN else 0), beats * BEAT, 0.62))
 
 # ---------- drums: names, date, finale ----------
 for bar in (9, 10, 11, 12, 15, 16):
@@ -175,7 +210,7 @@ for bar in (9, 10, 11, 12, 15, 16):
 add('drum', at(8, 3), kick(0.4))                  # pickup into the names
 
 # ---------- cues locked to the picture ----------
-for i, m in enumerate([74, 78, 81, 85, 81, 86]):          # seal pops in
+for i, m in enumerate([] if HYMN else [74, 78, 81, 85, 81, 86]):   # seal pops in
     add('bell', 0.25 + i * 0.3, bell(m, 0.35))
 add('fx', 3.5, swell(1.0, 0.5))                           # circle fills the frame
 add('fx', 5.9, boom(0.7))                                 # cornerstone lands
