@@ -4,13 +4,18 @@ Everything is synthesized here (no samples), so the track is ours to use. Cues f
 film's timeline in index.html: the cornerstone lands at 5.9 s, each block lands on an
 eighth note from 11.4 s, the doors shut on the bar line at 24.0 s, the digits roll at 25 s.
 
-usage: python compose.py out.wav [--hymn]
+usage: python compose.py out.wav [--hymn | --love]
 
 --hymn sets AURELIA (S. S. Wesley, 1864, public domain; "The Church's One Foundation",
 새찬송가 "교회의 참된 터는") as the melody instead of the original tune. Its eight lines of
 two bars each fill the film's sixteen bars. Only the opening phrase was checked against a
 published incipit (3-3-3-4-3-3-2-1-1-6-5-4-3-4-5); the rest is written from memory and
 still needs checking against a printed score.
+
+--love sets SANDRINGHAM (J. Barnby, 1889, public domain; "O Perfect Love", 결혼 찬송
+"완전한 사랑") after a two-bar intro: four lines of three bars, then a two-bar coda.
+Line one follows the published incipit (1-3-5-5-5-5-5-1-7-7-6-2-3-4-5); the rest is
+written from memory and needs checking against a printed score.
 """
 import sys
 import wave
@@ -18,6 +23,7 @@ import wave
 import numpy as np
 
 HYMN = '--hymn' in sys.argv
+LOVE = '--love' in sys.argv
 SR = 44100
 DUR = 38.0
 BEAT = 0.6           # 100 BPM
@@ -142,6 +148,16 @@ if HYMN:
         (13, 1, 'D', 2), (13, 3, 'Bm', 2), (14, 1, 'A', 2), (14, 3, 'D', 2),  # With His own blood...
         (15, 1, 'G', 2), (15, 3, 'D/F#', 2), (16, 1, 'A', 2), (16, 3, 'D', 3),  # And for her life He died
     ]
+if LOVE:
+    line = [(1, 'D', 4), (2, 'D', 2), (2.5, 'Bm', 2), (3, 'A', 2), (3.5, 'G', 2)]   # O perfect Love...
+    PROG = [(1, 1, 'Dmaj9', 8)]
+    for start in (3, 9):                                    # lines 1 and 3 share their music
+        PROG += [(start + int(o) - 1, 1 if o == int(o) else 3, c, b) for o, c, b in line]
+    PROG += [
+        (6, 1, 'Em', 2), (6, 3, 'A', 2), (7, 1, 'G', 2), (7, 3, 'D', 2), (8, 1, 'D/F#', 1), (8, 2, 'A', 3),
+        (12, 1, 'Em', 2), (12, 3, 'A', 2), (13, 1, 'G', 2), (13, 3, 'A', 2), (14, 1, 'A', 1), (14, 2, 'D', 3),
+        (15, 1, 'G', 2), (15, 3, 'A', 2), (16, 1, 'A', 2), (16, 3, 'D', 3),
+    ]
 for bar, beat, name, beats in PROG:
     b, up = CH[name]
     t0, d = at(bar, beat), beats * BEAT
@@ -191,12 +207,23 @@ if HYMN:
         13: q(66, 67, 69, 74), 14: [(1, 73, 1), (2, 71, 1), (3, 69, 2)],
         15: q(71, 69, 67, 66), 16: [(1, 64, 2), (3, 62, 3)],
     }
+if LOVE:
+    # SANDRINGHAM in D: 7.=61 1=62 2=64 3=66 4=67 5=69 6=71 7=73 8=74
+    q = lambda *ms: [(1 + i, m, 1) for i, m in enumerate(ms)]
+    L1 = [q(62, 66, 69, 69), q(69, 69, 69, 74), [(1, 73, 1), (2, 73, 1), (3, 71, 2)]]
+    MEL = {
+        3: L1[0], 4: L1[1], 5: L1[2],                                   # O perfect Love, all human thought transcending
+        6: q(64, 66, 67, 69), 7: q(71, 69, 67, 66), 8: [(1, 66, 1), (2, 64, 3)],   # Lowly we kneel in prayer before Thy throne
+        9: L1[0], 10: L1[1], 11: L1[2],                                 # That theirs may be the love which knows no ending
+        12: q(64, 66, 67, 69), 13: q(67, 66, 64, 62), 14: [(1, 61, 1), (2, 62, 3)],  # Whom Thou forevermore dost join in one
+        15: q(67, 66, 64, 62), 16: [(1, 61, 2), (3, 62, 3)],            # coda: ...join in one
+    }
 for bar, notes in MEL.items():
     for beat, m, beats in notes:
         if HYMN and bar <= 2:                       # the opening line rings out on bells
             add('bell', at(bar, beat), bell(m + 12, 0.32, 1.6))
         else:
-            add('piano', at(bar, beat), piano(m + (12 if HYMN else 0), beats * BEAT, 0.62))
+            add('piano', at(bar, beat), piano(m + (12 if HYMN or LOVE else 0), beats * BEAT, 0.5 if bar >= 15 and LOVE else 0.62))
 
 # ---------- drums: names, date, finale ----------
 for bar in (9, 10, 11, 12, 15, 16):
